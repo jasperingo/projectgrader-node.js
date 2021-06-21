@@ -1,0 +1,81 @@
+
+@font-face {
+  font-family: nunito;
+  src: url("../fonts/Nunito-Regular.ttf");
+}
+
+@font-face {
+  font-family: nunito-bold;
+  src: url("../fonts/Nunito-Bold.ttf");
+}
+
+* {
+  font-size: 10px;
+}
+
+.ff-bold {
+  font-weight: bold;
+  font-family: nunito-bold;
+}
+
+.svg-big {
+  width: 8rem;
+  height: 8rem;
+}
+
+
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 300px;
+  min-height: 100%;
+  position: relative;
+  font-family: nunito;
+}
+
+header svg {
+  width: 4rem;
+  height: 4rem;
+}
+
+main {
+  padding-bottom: 10rem;
+}
+
+footer {
+  bottom: 0;
+  width: 100%;
+  position: absolute;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
