@@ -1,16 +1,22 @@
+
+
+var HOD = require('../controllers/HodController');
+var auth = require('../middlewares/AuthMiddleware');
+var pager = require('../middlewares/PaginationMiddleware');
+
 var express = require('express');
 var router = express.Router();
-var i18n = require('i18n');
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
 
-router.get('/login', function (req, res) {
-  res.locals.yam = i18n.__('hello');
-  res.render('hod_login');
-})
+router.get('/', auth('hod', true), pager(), HOD.index);
+
+
+router.get('/login', auth('hod', true), HOD.getLogin);
+
+
+router.post('/login', HOD.postLogin);
+
+
 
 
 module.exports = router;

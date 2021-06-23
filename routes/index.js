@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'ProjectGrader - A school project grading system' });
+  res.render('index', { title: `${res.__('app_name')} - ${res.__('app_desc')}` });
 });
 
 module.exports = router;

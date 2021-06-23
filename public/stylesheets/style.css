@@ -23,6 +23,21 @@
   height: 8rem;
 }
 
+.svg-small {
+  width: 4rem;
+  height: 4rem;
+}
+
+.common-form {
+  max-width: 40rem;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid:not([multiple]):not([size]) {
+  background-image: none;
+}
+
+
 
 html {
   margin: 0;

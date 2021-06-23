@@ -1,0 +1,93 @@
+
+extends layout
+
+block content
+  
+  div.bg-dark.text-light.py-5
+    
+    div.container
+      
+      div.row.align-items-stretch
+
+        h2.col-md-8 Welcome, Prof. Job Paul
+        
+        form.col-md-4(method="GET", action="")
+          div.input-group
+            select#input-department.form-select(name="fsection")
+              option(disabled)= __('Choose a section')
+              each d, i in sections
+                option(value=d selected=(d==section?true:false))=d
+            button.btn.btn-primary(type="submit")= __('Search')
+  
+
+  div.py-5
+
+    ul.container.list-unstyled
+      
+      -var empty_text = __('No project found') 
+      each d in data
+
+        li
+          div.card.border-dark.mb-3
+            div.card-header= d.supervisor_name
+            div.card-body.text-dark
+            
+              table.table
+                thead
+                  tr
+                    th(scope="col") #
+                    th(scope="col")= __('Name')
+                    th(scope="col")= __('Matriculation Number')
+                    th(scope="col")= __('Status')
+                    th(scope="col") 
+                tbody
+                  each s, i in d.projects
+                    tr
+                      th(scope="row")=i+1
+                      td=s.student_name
+                      td=s.student_matric_number
+                      td Pending
+                      td
+                        a(href="#") View
+
+                  else 
+
+                    tr
+                      td(colspan="5")
+                        include no_data
+      
+      else
+
+        li
+          include no_data
+
+    div=data_page
+    div=data_count
+
+    
+    div.container.my-5(aria-label="Page navigation example")
+      ul.pagination.justify-content-end
+        li.page-item.disabled
+          a.page-link(href="#", tabindex="-1", aria-disabled="true") Previous
+        
+        -var start = data_count<=2 ? 1 : data_count-2
+        -var end = data_count<=5 ? data_count : start+5
+        li=end
+        -for(var i=start; i<=end; i++)
+          li.page-item(class=(i==data_page ? 'active' : ''))
+            a.page-link(href='?page='+i)=i
+        
+        li.page-item
+          a.page-link(href="#") Next
+
+
+
+
+
+
+
+
+
+
+
+

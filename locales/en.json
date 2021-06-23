@@ -1,8 +1,46 @@
 {
+	
+	"app_name" : "ProjectGrader",
 
-	"hello" : "how are you"
+	"app_desc" : "A school project grading system",
+
+	"hello": "how are you",
+	"Search" : "Search",
+	"View" : "View",
+	"Status" : "Status",
+	"Section" : "Section", 
+	"Sections" : "Sections", 
+	"Choose a section" : "Choose a section",
+	"No project found" : "No project found",
+
+	
+	"user": {
+		"Login" : "Login",
+		"{{ name }} Login" : "{{ name }} Login",
+		"Name" : "Name", 
+		"Department": "Department",
+		"Password": "Password",
+		"Head of Department" : "Head of Department",
+		"Matriculation Number" : "Matriculation Number"
+	},
+
+	"errors-msgs" : {
+		"unknown" : "Oop! there was an error.",
+		"Password" : "Password is incorrect.",
+		"Email" : "Email is incorrect.",
+		"credentials" : "The credentials you provided is incorrect."
+	},
+
+
+	"departments-array" : [
+		"Information Technology",
+		"Computer Science"
+	]
 
 }
+
+
+
 
 
 
