@@ -1,0 +1,23 @@
+
+
+div.bg-dark.text-light.py-5
+    
+  div.container
+      
+    div.row.align-items-stretch
+
+      h2.col-md-8 #{__('Welcome')} #{user.name}
+        
+      form.col-md-4(method="GET", action="")
+        div.input-group
+          select#input-department.form-select(name="fsection")
+            option(disabled)= __('Choose a section')
+            each d, i in sections
+              option(value=d selected=(d==section?true:false))=d
+          button.btn.btn-primary(type="submit")= __('Search')
+  
+
+
+
+
+

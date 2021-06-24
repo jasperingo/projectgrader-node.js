@@ -1,0 +1,26 @@
+
+
+div.py-5
+
+  ul.container.list-unstyled
+      
+    -var empty_text = __('No project found') 
+    each d in data
+
+      li
+        div.card.border-dark.mb-3
+          div.card-header= d.supervisor_name
+          div.card-body.text-dark
+            
+            include project_list_table
+      
+    else
+
+      li
+        include no_data
+
+    
+  include pagination
+
+
+

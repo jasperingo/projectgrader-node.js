@@ -1,0 +1,19 @@
+
+
+
+div.container.my-5(aria-label="Page navigation example")
+  ul.pagination.justify-content-end
+
+    li.page-item(class=pagination.previous?'':'disabled')
+      a.page-link(href=pagination.url+(pagination.page-1), tabindex=pagination.previous?'':'-1')= __('Previous')
+        
+        
+    -for(var i=pagination.start; i<pagination.len; i++)
+      li.page-item(class=(i==pagination.page ? 'active' : ''))
+        a.page-link(href=pagination.url+i)=i
+        
+    li.page-item(class=pagination.next?'':'disabled')
+      a.page-link(href=pagination.url+(pagination.page+1), tabindex=pagination.next?'':'-1')= __('Next')
+
+
+

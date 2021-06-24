@@ -14,6 +14,8 @@ var { db } = require('./db');
 var indexRouter = require('./routes/index');
 var hodRouter = require('./routes/hod');
 var isRouter = require('./routes/is');
+var esRouter = require('./routes/es');
+var projectRouter = require('./routes/project');
 
 
 var app = express();
@@ -52,8 +54,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/hod', hodRouter);
 app.use('/is', isRouter);
-
-
+app.use('/es', esRouter);
+app.use('/project', projectRouter);
 
 
 

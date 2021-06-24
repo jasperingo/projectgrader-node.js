@@ -21,6 +21,8 @@ exports.index = async function (req, res, next) {
 			var pageUrl = `${req.baseUrl}${req.path}?page=`;
 		}
 
+		// filter by hod department
+
 		var data = await Project.findAllBySection(section, req.myPager[1]);
 
 		var count = await Project.countAllBySection(section);
@@ -29,6 +31,7 @@ exports.index = async function (req, res, next) {
 		
 		res.render('hod_dashboard', {
 		    title: res.__('user.Head of Department'),
+		    user : { name : 'Prof. Biscuit Half' },
 		    sections: sections,
 		    section: section,
 		    data: data,

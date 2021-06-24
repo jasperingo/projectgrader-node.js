@@ -4,6 +4,7 @@
 
 	"app_desc" : "A school project grading system",
 
+	"Welcome" : "Welcome",
 	"Next": "Next",
 	"Previous" : "Previous",
 	"Search" : "Search",
@@ -12,6 +13,7 @@
 	"Section" : "Section", 
 	"Sections" : "Sections", 
 	"Choose a section" : "Choose a section",
+	"Choose a department" : "Choose a department",
 	"No project found" : "No project found",
 
 	

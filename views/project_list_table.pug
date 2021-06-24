@@ -1,0 +1,30 @@
+
+
+table.table
+  thead
+    tr
+      th(scope="col") #
+      th(scope="col")= __('Name')
+      th(scope="col")= __('Matriculation Number')
+      th(scope="col")= __('Status')
+      th(scope="col") 
+  tbody
+    each s, i in d.projects
+      tr
+        th(scope="row")=i+1
+        td=s.student_name
+        td=s.student_matric_number
+        td=__('project-status-array.'+s.status)
+        td
+          a(href='/project/'+s.id)= __('View')
+
+    else 
+
+      tr
+        td(colspan="5")
+          include no_data
+
+
+
+
+          

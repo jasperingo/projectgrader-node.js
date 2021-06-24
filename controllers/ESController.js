@@ -1,33 +1,38 @@
 'use strict'
 
 
-var IS = require('../models/IS');
+var ES = require('../models/ES');
 var Project = require('../models/Project');
 var { getPagination } = require('../Helpers');
 
 
 
-exports.index = async function (req, res) {
+exports.index = async function (req, res, next) {
 	
 	try {
 
-		var sections = await Project.findAllDistinct('section');
+		var sections = await Project.findSectionsByExternalSupervisor(1);
 
 		var section = sections[0];
 
 		if (req.query.fsection && sections.indexOf(req.query.fsection) > -1) {
 			section = req.query.fsection;
+			var pageUrl = `${req.baseUrl}${req.path}?fsection=${section}&page=`;
+		} else {
+			var pageUrl = `${req.baseUrl}${req.path}?page=`;
 		}
 
-		var data = await Project.findAllBySectionAndSupervisor(section, 1);
+		var data = await Project.findAllBySectionAndExternalSupervisor(section, 1, req.myPager[1]);
 
+		var count = await Project.countAll({section});
 		
-		res.render('is_dashboard', {
-		    title: res.__('user.Internal Supervisor'),
+		res.render('es_dashboard', {
+		    title: res.__('user.External Supervisor'),
 		    user : { name : 'Prof. Biscuit Half' },
 		    sections: sections,
 		    section: section,
 		    data: data,
+		    pagination: getPagination(req.myPager[0], Math.ceil(count/req.myPager[1][1]), pageUrl),
 		});
 
 	} catch (error) {
@@ -37,12 +42,12 @@ exports.index = async function (req, res) {
 
 
 exports.getLogin = function (req, res) {
-	
+
 	var input_values = req.flash('login_values')[0];
 
 	res.render('supervisor_login', {
-	    title : res.__('user.{{ name }} Login', { name : res.__('user.Internal Supervisor')}),
-	    supervisor_type : res.__('user.Internal Supervisor'),
+	    title : res.__('user.{{ name }} Login', { name : res.__('user.External Supervisor')}),
+	    supervisor_type : res.__('user.External Supervisor'),
 	    input_errors : req.flash('login_errors'),
 	    input_values : input_values ? input_values : ''
 	});
@@ -53,7 +58,7 @@ exports.postLogin = async function (req, res) {
 
   	try {
   		
-  		var result = await IS.findByEmail(req.body.email);
+  		var result = await ES.findByEmail(req.body.email);
 
   		if (!result || result.password !== req.body.password) {
   			
@@ -63,7 +68,7 @@ exports.postLogin = async function (req, res) {
   	 	
   	 	} else {
 
-  	 		req.session.is = { 
+  	 		req.session.es = { 
   	 			id : result.id,
   	 			name : result.name
   	 		};
@@ -82,6 +87,9 @@ exports.postLogin = async function (req, res) {
   	}
 
 }
+
+
+
 
 
 
