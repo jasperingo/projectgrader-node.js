@@ -4,7 +4,8 @@
 
 	"app_desc" : "A school project grading system",
 
-	"hello": "how are you",
+	"Next": "Next",
+	"Previous" : "Previous",
 	"Search" : "Search",
 	"View" : "View",
 	"Status" : "Status",
@@ -18,9 +19,12 @@
 		"Login" : "Login",
 		"{{ name }} Login" : "{{ name }} Login",
 		"Name" : "Name", 
+		"Email" : "Email",
 		"Department": "Department",
 		"Password": "Password",
 		"Head of Department" : "Head of Department",
+		"Internal Supervisor" : "Internal Supervisor",
+		"External Supervisor" : "External Supervisor",
 		"Matriculation Number" : "Matriculation Number"
 	},
 
@@ -31,6 +35,12 @@
 		"credentials" : "The credentials you provided is incorrect."
 	},
 
+
+	"project-status-array" : [
+		"Pending",
+		"Failed",
+		"Passed"
+	],
 
 	"departments-array" : [
 		"Information Technology",

@@ -46,9 +46,9 @@ block content
                       th(scope="row")=i+1
                       td=s.student_name
                       td=s.student_matric_number
-                      td Pending
+                      td=__('project-status-array.'+s.status)
                       td
-                        a(href="#") View
+                        a(href='/project/'+s.id)= __('View')
 
                   else 
 
@@ -61,24 +61,20 @@ block content
         li
           include no_data
 
-    div=data_page
-    div=data_count
-
     
     div.container.my-5(aria-label="Page navigation example")
       ul.pagination.justify-content-end
-        li.page-item.disabled
-          a.page-link(href="#", tabindex="-1", aria-disabled="true") Previous
+
+        li.page-item(class=pagination.previous?'':'disabled')
+          a.page-link(href=pagination.url+(pagination.page-1), tabindex=pagination.previous?'':'-1')= __('Previous')
         
-        -var start = data_count<=2 ? 1 : data_count-2
-        -var end = data_count<=5 ? data_count : start+5
-        li=end
-        -for(var i=start; i<=end; i++)
-          li.page-item(class=(i==data_page ? 'active' : ''))
-            a.page-link(href='?page='+i)=i
         
-        li.page-item
-          a.page-link(href="#") Next
+        -for(var i=pagination.start; i<pagination.len; i++)
+          li.page-item(class=(i==pagination.page ? 'active' : ''))
+            a.page-link(href=pagination.url+i)=i
+        
+        li.page-item(class=pagination.next?'':'disabled')
+          a.page-link(href=pagination.url+(pagination.page+1), tabindex=pagination.next?'':'-1')= __('Next')
 
 
 

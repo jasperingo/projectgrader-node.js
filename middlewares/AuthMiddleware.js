@@ -6,9 +6,9 @@ function auth(type, redirectOnSuccess) {
 	return (req, res, next) => {
 
 		if (redirectOnSuccess && req.session[type]) {
-			res.redirect('./');
+			res.redirect(req.baseUrl);
 		} else if (!redirectOnSuccess && !req.session[type]) {
-			res.redirect('login');
+			res.redirect(`${req.baseUrl}/login`);
 		} else {
 			next();
 		}
@@ -19,5 +19,6 @@ function auth(type, redirectOnSuccess) {
 
 
 module.exports = auth;
+
 
 

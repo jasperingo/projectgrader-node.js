@@ -13,6 +13,7 @@ module.exports = class HOD {
 
 		return new Promise((resolve, reject) => {
 			db.query("SELECT * FROM hod WHERE id = ?", [id], (err, [result]) => {
+				if (err) reject(err);
 				resolve(result);
 			});
 		});
@@ -23,6 +24,7 @@ module.exports = class HOD {
 
 		return new Promise((resolve, reject) => {
 			db.query("SELECT * FROM hod WHERE department = ?", [department], (err, [result]) => {
+				if (err) reject(err);
 				resolve(result);
 			});
 		});

@@ -1,6 +1,7 @@
 'use strict'
 
-var HOD = require('../models/HOD');
+
+var IS = require('../models/IS');
 var Project = require('../models/Project');
 var { getPagination } = require('../Helpers');
 
@@ -8,6 +9,7 @@ var { getPagination } = require('../Helpers');
 
 exports.index = async function (req, res, next) {
 	
+
 	try {
 
 		var sections = await Project.findAllDistinct('section');
@@ -43,20 +45,18 @@ exports.index = async function (req, res, next) {
 
 exports.getLogin = function (req, res) {
 	
-	res.render('hod_login', {
-	    title : res.__('user.{{ name }} Login', { name : res.__('user.Head of Department')}),
+	res.render('supervisor_login', {
+	    title : res.__('user.{{ name }} Login', { name : res.__('user.Internal Supervisor')}),
 	    input_errors : req.flash('login_errors')
 	});
 }
 
 
 exports.postLogin = async function (req, res) {
-	
-  	var department = req.__('departments-array')[req.body.department];
 
   	try {
   		
-  		var result = await HOD.findByDepartment(department);
+  		var result = await IS.findByEmail(req.body.email);
 
   		if (!result || result.password !== req.body.password) {
   			
@@ -65,14 +65,14 @@ exports.postLogin = async function (req, res) {
   	 	
   	 	} else {
 
-  	 		req.session.hod = { 
+  	 		req.session.is = { 
   	 			id : result.id,
   	 			name : result.name
   	 		};
 
   	 		res.redirect('./');
 
-  			console.log(result);
+  			//console.log(result);
   	 	}
 
   	} catch (error) {
@@ -83,6 +83,9 @@ exports.postLogin = async function (req, res) {
   	}
 
 }
+
+
+
 
 
 

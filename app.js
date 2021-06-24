@@ -13,6 +13,7 @@ var { db } = require('./db');
 
 var indexRouter = require('./routes/index');
 var hodRouter = require('./routes/hod');
+var isRouter = require('./routes/is');
 
 
 var app = express();
@@ -50,6 +51,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/hod', hodRouter);
+app.use('/is', isRouter);
+
+
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
