@@ -1,0 +1,82 @@
+extends layout
+
+
+block content
+
+  include input_mixins
+  
+  div.container
+
+    form.common-form.mx-auto.my-5.p-5.bg-light.rounded(method="POST" action="add-student")
+
+      include signup_icon
+      
+      h3.text-center.text-uppercase.mb-3= __('user.Student')
+      
+      +formMsg()
+
+      div.row.mb-3
+        label.col-sm-2.col-form-label(for="input-name")= __('user.Name')
+        div.col-sm-10
+          input#input-name.form-control(
+            type="text", 
+            name="name", 
+            class= inputHasError('name'),
+            value= inputHasValue('name'),
+            required
+          )
+          +errorBox('name')
+
+      div.row.mb-3
+        label.col-sm-2.col-form-label(for="input-matric")= __('user.Matriculation number')
+        div.col-sm-10
+          input#input-matric.form-control(
+            type="text", 
+            name="matric_number", 
+            class= inputHasError('matric_number'),
+            value= inputHasValue('matric_number'),
+            required
+          )
+          +errorBox('matric_number')
+      
+      div.row.mb-3
+        label.col-sm-2.col-form-label(for="input-department")= __('user.Department')
+        div.col-sm-10
+          select#input-department.form-select(
+            name="department",
+            class= inputHasError('department'),
+            required
+          )
+            option(value="")=__('Choose a department')
+            - var depts = __('departments-array');
+            each d, i in depts
+              option(
+                value= i,
+                selected= selectHasValue('department', i)
+              )= d
+          +errorBox('department')
+      
+      div.row.mb-3
+        label.col-sm-2.col-form-label(for="input-level")= __('user.Level')
+        div.col-sm-10
+          input#input-level.form-control(
+            type="number", 
+            name="level"
+            step="100"
+            min="100"
+            class= inputHasError('level'),
+            value= inputHasValue('level'),
+            required
+          )
+          +errorBox('level')
+  
+      button.btn.btn-primary(type="submit")= __('user.Add')
+
+
+
+
+
+
+
+
+

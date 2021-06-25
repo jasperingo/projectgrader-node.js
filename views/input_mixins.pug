@@ -1,0 +1,22 @@
+
+mixin errorBox(type)
+  div.invalid-feedback= form_data && form_data[type] && form_data[type].error ? form_data[type].error : ''
+
+mixin formMsg()
+  if form_data && form_data.form_error
+    div.alert.alert-danger(role="alert")= form_data.form_error
+
+  else if form_data && form_data.form_success
+    div.alert.alert-success(role="alert")= form_data.form_success
+
+
+
+- function inputHasError(type) { return form_data && form_data[type] && form_data[type].error ? 'is-invalid' : ''; }
+
+- function inputHasValue(type) { return form_data && form_data[type] ? form_data[type].value : ''; }
+
+- function selectHasValue(type, i) { return form_data && form_data[type] && form_data[type].value == i ? true : false; }
+
+
+
+

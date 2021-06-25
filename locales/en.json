@@ -14,26 +14,51 @@
 	"Sections" : "Sections", 
 	"Choose a section" : "Choose a section",
 	"Choose a department" : "Choose a department",
+
+	"Project" : "Project",
+	"Projects" : "Projects",
 	"No project found" : "No project found",
 
 	
 	"user": {
+		"ID" : "ID",
+		"Add" : "Add",
 		"Login" : "Login",
+		"Log out" : "Log out",
 		"{{ name }} Login" : "{{ name }} Login",
+		"{{ name }} Add" : "{{ name }} Add",
 		"Name" : "Name", 
 		"Email" : "Email",
 		"Department": "Department",
 		"Password": "Password",
+		"Matriculation number" : "Matriculation number",
+		"Level" : "Level",
+		"Add hod" : "Add hod", 
+      	"Add student" : "Add student", 
+      	"Add Internal Supervisor" : "Add Internal Supervisor",
+      	"Add External Supervisor" : "Add External Supervisor",
+       	"Add project" : "Add project",
+      	"Update project" : "Update project",
+		"Student" : "Student", 
+		"Administrator" : "Administrator",
 		"Head of Department" : "Head of Department",
 		"Internal Supervisor" : "Internal Supervisor",
+		"Internal Supervisor Email" : "Internal Supervisor Email",
 		"External Supervisor" : "External Supervisor",
-		"Matriculation Number" : "Matriculation Number"
+		"Matriculation Number" : "Matriculation Number",
+		"Student has been added" : "Student has been added",
+		"Head of Department has been added" : "Head of Department has been added",
+		"Internal Supervisor has been added" : "Internal Supervisor has been added",
+		"External Supervisor has been added" : "External Supervisor has been added"
 	},
 
 	"errors-msgs" : {
 		"unknown" : "Oop! there was an error.",
-		"Password" : "Password is incorrect.",
-		"Email" : "Email is incorrect.",
+		"Password length" : "Password must be more than 5 characters.",
+		"Email" : "Email is invalid.",
+		"required" : "Field is required.",
+		"Level is invalid" : "Level is invalid",
+		"Matriculation number is invalid" : "Matriculation number is invalid",
 		"credentials" : "The credentials you provided is incorrect."
 	},
 
@@ -46,10 +71,31 @@
 
 	"departments-array" : [
 		"Information Technology",
-		"Computer Science"
+		"Computer Science",
+		"Software Engineering",
+		"Project Managemant Technology"
 	]
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

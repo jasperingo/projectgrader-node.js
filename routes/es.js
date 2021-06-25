@@ -9,13 +9,19 @@ var express = require('express');
 var router = express.Router();
 
 
-router.get('/', auth('es', true), pager(), ES.index);
+
+router.get('/add', auth('admin', false), ES.getAdd);
+
+router.post('/add', auth('admin', false), ES.postAdd);
+
+
+router.get('/', auth('es', false), pager(), ES.index);
 
 
 router.get('/login', auth('es', true), ES.getLogin);
 
 
-router.post('/login', ES.postLogin);
+router.post('/login', auth('es', true), ES.postLogin);
 
 
 

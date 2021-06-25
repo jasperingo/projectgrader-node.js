@@ -6,16 +6,20 @@ div.bg-dark.text-light.py-5
       
     div.row.align-items-stretch
 
-      h2.col-md-8 #{__('Welcome')} #{user.name}
-        
-      form.col-md-4(method="GET", action="")
-        div.input-group
-          select#input-department.form-select(name="fsection")
-            option(disabled)= __('Choose a section')
-            each d, i in sections
-              option(value=d selected=(d==section?true:false))=d
-          button.btn.btn-primary(type="submit")= __('Search')
+      h2.col-md-8 #{__('Welcome')}, #{user.name}
+      
+      if (user.role != 'admin')
+        form.col-md-4(method="GET", action="")
+          div.input-group
+            select#input-department.form-select(name="fsection")
+              option(disabled)= __('Choose a section')
+              each d, i in sections
+                option(value=d selected=(d==section?true:false))=d
+            button.btn.btn-primary(type="submit")= __('Search')
   
+    form.mt-3(method="POST", action='/'+user.role+'/logout')
+      div.input-group
+        button.btn.btn-danger(type="submit")= __('user.Log out')
 
 
 

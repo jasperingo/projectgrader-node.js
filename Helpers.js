@@ -1,6 +1,20 @@
 'use strict'
 
 
+var bcrypt = require('bcrypt');
+
+
+
+function hashPassword(password, callback) {
+	return bcrypt.hash(password, 10);
+};
+
+function comparePassword(plain, hash) {
+    return bcrypt.compare(plain, hash);
+};
+
+
+
 function getPagination(page, maxPages, url) {
 	
 	var data = { page, url };
@@ -44,12 +58,48 @@ function getPagination(page, maxPages, url) {
 
 
 
+function sessionSetter(req, type, data) {
+	req.session[type] = { 
+  	 	id : data.id,
+  	 	name : data.name
+  	};
+}
 
+
+function postFlasher (body, errs=[], form=null) {
+
+	var inputs = Object.entries(body);
+
+	var formData = {};
+
+	for (let [i, v] of inputs) {
+	    formData[i] = {value : v};
+	    for (let e of errs) {
+	    	if (i == e.param) {
+	    		formData[i].error = e.msg;
+		    }
+		}
+	}
+
+	if (form && form.error) {
+		formData.form_error = form.error;
+	}
+
+	if (form && form.success) {
+		formData.form_success = form.success;
+	}
+
+	return formData;
+}
 
 
 
 module.exports = {
-	getPagination
+	getPagination,
+	postFlasher,
+	hashPassword,
+	comparePassword,
+	sessionSetter
 }
 
 

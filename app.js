@@ -9,13 +9,17 @@ var flash = require('connect-flash');
 var logger = require('morgan');
 var i18n = require('i18n');
 var { db } = require('./db');
+var MySQLStore = require('express-mysql-session')(session);
 
+
+var sessionStore = new MySQLStore({}, db);
 
 var indexRouter = require('./routes/index');
 var hodRouter = require('./routes/hod');
 var isRouter = require('./routes/is');
 var esRouter = require('./routes/es');
 var projectRouter = require('./routes/project');
+var adminRouter = require('./routes/admin');
 
 
 var app = express();
@@ -43,6 +47,7 @@ app.use(cookieParser());
 app.use(session({
   name: 'projectgrader-sid',
 	secret: "abcdefghijklmnopqrstuvwxyz",
+  store: sessionStore,
 	resave: false,
 	saveUninitialized: false
 }));
@@ -56,7 +61,7 @@ app.use('/hod', hodRouter);
 app.use('/is', isRouter);
 app.use('/es', esRouter);
 app.use('/project', projectRouter);
-
+app.use('/admin', adminRouter);
 
 
 // catch 404 and forward to error handler

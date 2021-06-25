@@ -1,0 +1,42 @@
+extends layout
+
+block content
+  
+  include input_mixins
+
+  div.container
+
+    form.common-form.mx-auto.my-5.p-5.bg-light.rounded(method="POST" action="login")
+
+      include login_icon
+      
+      h3.text-center.text-uppercase.mb-3= __('user.Administrator')
+      
+      +formMsg()
+      
+      div.row.mb-3
+        label.col-sm-2.col-form-label(for="input-id")= __('user.ID')
+        div.col-sm-10
+          input#input-id.form-control(
+            type="number", 
+            name="admin_id", 
+            min="1" 
+            value= inputHasValue('admin_id'),
+            required
+          )
+      
+      div.row.mb-3
+        label.col-sm-2.col-form-label(for="input-password")= __('user.Password')
+        div.col-sm-10
+          input#input-password.form-control(type="password", name="password", required)
+  
+      button.btn.btn-primary(type="submit")= __('user.Login')
+
+
+
+
+
+
+
+
+

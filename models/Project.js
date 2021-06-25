@@ -65,12 +65,14 @@ module.exports = class Project {
 
 
 	static findAllBySectionAndDepartment(section, department, limit) {
-		return Project.findInternalSupervisors({section, department}, limit).then((results) => Project.findByInternalSupervisors(section, results));
+		return Project.findInternalSupervisors({section, department}, limit)
+			.then((results) => Project.findByInternalSupervisors(section, results));
 	}
 
 
 	static findAllBySectionAndExternalSupervisor(section, externalSupervisor, limit) {
-		return Project.findInternalSupervisors({section, externalSupervisor}, limit).then((results) => Project.findByInternalSupervisors(section, results));
+		return Project.findInternalSupervisors({section, externalSupervisor}, limit)
+			.then((results) => Project.findByInternalSupervisors(section, results));
 	}
 
 	static findByInternalSupervisors(section, results) {

@@ -1,0 +1,39 @@
+
+extends layout
+
+
+mixin listItem(url, text)
+  li.pb-4.col-sm-6
+    div.card
+      div.card-body.py-3.text-center
+        a.btn.btn-primary.px-5.py-4.fs-3.text-uppercase.w-100(href=url)= __(text)
+
+
+block content
+  
+  include dashboard_header
+  
+  div.container
+    
+    ul.row.list-unstyled.my-5.align-items-stretch
+      
+      +listItem('/hod/add', 'user.Add hod')
+
+      +listItem('add-student', 'user.Add student')
+
+      +listItem('/is/add', 'user.Add Internal Supervisor')
+
+      +listItem('/es/add', 'user.Add External Supervisor')
+
+      +listItem('/project/add', 'user.Add project')
+
+      +listItem('/project/update', 'user.Update project')
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,62 @@
+extends layout
+
+
+block content
+  
+  include input_mixins
+  
+  div.container
+
+    form.common-form.mx-auto.my-5.p-5.bg-light.rounded(method="POST" action="")
+
+      include signup_icon
+      
+      h3.text-center.text-uppercase.mb-3= __('user.External Supervisor')
+      
+      +formMsg()
+
+      div.row.mb-3
+        label.col-sm-2.col-form-label(for="input-name")= __('user.Name')
+        div.col-sm-10
+          input#input-name.form-control(
+            type="text", 
+            name="name", 
+            class= inputHasError('name'),
+            value= inputHasValue('name'),
+            required
+          )
+          +errorBox('name')
+
+      div.row.mb-3
+        label.col-sm-2.col-form-label(for="input-email")= __('user.Email')
+        div.col-sm-10
+          input#input-email.form-control(
+            type="email", 
+            name="email", 
+            class= inputHasError('email'),
+            value= inputHasValue('email'),
+            required
+          )
+          +errorBox('name')
+      
+      div.row.mb-3
+        label.col-sm-2.col-form-label(for="input-password")= __('user.Password')
+        div.col-sm-10
+          input#input-password.form-control(
+            type="password", 
+            name="password"
+            class= inputHasError('password'),
+            minlength="6"
+            required
+          )
+          +errorBox('password')
+  
+      button.btn.btn-primary(type="submit")= __('user.Add')
+
+
+
+
+
+
+
+
