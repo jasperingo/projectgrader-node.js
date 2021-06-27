@@ -2,7 +2,10 @@
 
 
 var Project = require('../models/Project');
-var { getPagination, postFlasher, hashPassword } = require('../Helpers');
+var IS = require('../models/IS');
+var Student = require('../models/Student');
+
+var { getPagination, postFlasher, hashPassword, getSectionArray } = require('../Helpers');
 
 var { body, validationResult } = require('express-validator');
 
@@ -14,13 +17,28 @@ exports.index = function (req, res) {
 }
 
 
+exports.getUpdate = function (req, res) {
+	
+	res.render('project_update', {
+	    title : res.__('Project Add'),
+	    form_data : req.flash('form_data')[0],
+	    sections : getSectionArray()
+	});
+}
+
+
+
+exports.postUpdate = [
+
+];
+
 
 exports.getAdd = function (req, res) {
 	
 	res.render('project_add', {
-	    title : res.__('user.{{ name }} Add', { name : res.__('user.Head of Department')}),
+	    title : res.__('Project Add'),
 	    form_data : req.flash('form_data')[0],
-	    year : new Date().getFullYear()
+	    sections : getSectionArray()
 	});
 }
 
@@ -28,59 +46,205 @@ exports.getAdd = function (req, res) {
 
 exports.postAdd = [
 	
-	body('name').trim().isLength({ min: 1 }).withMessage((value, {req}) => req.__('errors-msgs.required')).escape(),
-    
-    body('department').trim().custom((value, { req }) => {
-	    if (!req.__('departments-array')[value]) {
-	    	throw new Error(req.__('Choose a department'));
-	    }
-	    return true;
+	body('email').trim().isEmail().withMessage((value, {req}) => req.__('errors-msgs.Email')).bail()
+	.custom(async (value, { req }) => {
+	    
+	    try {
+
+			var result = await IS.findByEmail(req.body.email); 
+
+		    if (!result) {
+		    	throw new Error(req.__('errors-msgs.Email'));
+		    }
+
+		    req.body.ISID = result.id;
+
+		    req.body.ISDEPT = result.department;
+
+		    return true;
+
+		} catch (error) {
+			throw error;
+		}
+
+	}).bail()
+	.custom(async (value, { req }) => {
+
+		try {
+		    
+			var students = await Project.findAllBySectionAndInternalSupervisor(req.body.section, req.body.ISID);
+
+		    if (students.length > 0) {
+		    	throw new Error(req.__('errors-msgs.Internal Supervisor assigned'));
+		    }
+
+		    return true;
+
+	    } catch (error) {
+			throw error;
+		}
+
 	}).escape(),
 
-    body('password').isLength({ min: 6 }).withMessage((value, {req}) => req.__('errors-msgs.Password length')),
 
-	async function (req, res) {
+    body('section').trim().isIn(getSectionArray()).withMessage((value, {req}) => req.__('Choose a section')),
+
+
+	function (req, res, next) {
 		
 	  	var errors = validationResult(req);
 	  	
 	    if (!errors.isEmpty()) {
 
-	    	req.flash('form_data', postFlasher(req.body, errors.array()));
+	    	var emailErrs = [req.__('errors-msgs.Email'), req.__('errors-msgs.Internal Supervisor assigned')];
+
+	    	var errs = errors.array();
+
+	    	var formErr = null;
+
+	    	for (var i=0; i<errs.length; i++) {
+	    		if (errs[i].param === 'email' && emailErrs.indexOf(errs[i].msg) < 0) {
+	    			errs.splice(i, 1);
+	    			formErr = { error : req.__('errors-msgs.unknown') };
+	    			break;
+	    		}
+	    	}
+
+	    	req.flash('form_data', postFlasher(req.body, errs, formErr));
 
 	    	res.redirect('add');
 	    	
 	    } else {
 
-		  	try {
-		  		
-		  		var hod = new HOD(
-		  			req.body.name, 
-		  			req.__('departments-array')[req.body.department], 
-		  			await hashPassword(req.body.password)
-		  		);
+	    	next();
+	    }
+	}, 
 
-		  		
-		  		var result = await hod.upsert();
+	async function (req, res, next) {
 
-		  		req.flash('form_data', {
-		  			form_success : req.__('user.Head of Department has been added')
-		  		});
 
-		  	} catch (error) {
+		var students = req.body['students[]'], errs = [], formErrs = null;
 
-		  		req.flash('form_data', postFlasher(req.body, [], { error : req.__('errors-msgs.unknown') }));
+		if (students.length > 10) {
 
-		  		console.log(error);
+			formErrs = {
+				error : req.__('errors-msgs.Internal Supervisor max students')
+			}
 
-		  	} finally {
+		} else {
 
-	    		res.redirect('add');
+			req.body.STDIDS = [];
+
+			var filled = 0;
+
+			for (let i=0; i<students.length; i++) {
+
+				if (students[i].length == 0) continue;
+
+				filled++;
+
+				if (students[i].length != 11) {
+					errs.push({
+						param : `students${i}`,
+						msg : req.__('errors-msgs.Matriculation number is invalid')
+					});
+					continue;
+				}
+
+				var result = await Student.findByMatricNumber(students[i]);
+
+				if (!result) {
+					errs.push({
+						param : `students${i}`,
+						msg : req.__('errors-msgs.Matriculation number is invalid')
+					});
+					continue;
+				}
+
+				var project = await Project.findByStudentAndSection(result.id, req.body.section)
+
+				if (project) {
+					errs.push({
+						param : `students${i}`,
+						msg : req.__('errors-msgs.Student max projects')
+					});
+					continue;
+				}
+
+				if (req.body.ISDEPT !== result.department) {
+					errs.push({
+						param : `students${i}`,
+						msg : req.__('errors-msgs.Student IS department')
+					});
+					continue;
+				}
+
+				req.body.STDIDS.push(result.id);
+
+			}
+
+			if (filled == 0) {
+				formErrs = {
+					error : req.__('errors-msgs.Internal Supervisor min students')
+				}
+			}
+		}
+
+		if (formErrs != null || errs.length > 0) {
+			console.log(errs, formErrs)
+			req.flash('form_data', postFlasher(req.body, errs, formErrs));
+
+	    	res.redirect('add');
+
+	    } else {
+
+	    	next();
+	    }
+
+	},
+
+	async function (req, res) {
+
+		try {
+		  	
+		  	var values = [];
+
+		  	for (let ID of req.body.STDIDS) {
+		  		values.push({
+		  			student : ID,
+		  			supervisor : req.body.ISID,
+		  			department : req.body.ISDEPT,
+		  			section : req.body.section
+		  		})
 		  	}
+		  	
+		  	var result = await Project.saveMany(values);
 
+		  	req.flash('form_data', {
+		  		form_success : req.__('user.Project has been added')
+		  	});
+
+		} catch (error) {
+
+		  	req.flash('form_data', postFlasher(req.body, [], { error : req.__('errors-msgs.unknown') }));
+
+		  	console.log(error);
+
+		} finally {
+
+	    	res.redirect('add');
 		}
 
 	}
 ];
+
+
+
+
+
+
+
+
 
 
 

@@ -16,7 +16,7 @@ block content
       +formMsg()
 
       div.mb-3
-        label.col-form-label(for="input-email")= __('user.Internal Supervisor Email')
+        label.col-form-label(for="input-email")= __('user.External Supervisor Email')
         div
           input#input-email.form-control(
             type="email", 
@@ -26,6 +26,23 @@ block content
             required
           )
           +errorBox('email')
+
+      div.row.mb-3
+        label.col-sm-2.col-form-label(for="input-department")= __('user.Department')
+        div.col-sm-10
+          select#input-department.form-select(
+            name="department",
+            class= inputHasError('department'),
+            required
+          )
+            option(value="")=__('Choose a department')
+            - var depts = __('departments-array');
+            each d, i in depts
+              option(
+                value= i,
+                selected= selectHasValue('department', i)
+              )= d
+          +errorBox('department')
       
       div.row.mb-3
         label.col-sm-2.col-form-label(for="input-section")= __('Section')
@@ -43,21 +60,17 @@ block content
               )= i
           +errorBox('section')
       
-      h4.text-center.text-uppercase.mt-5.mb-3= __('Students')
-
-      -for (var i=1; i<11; i++)
-        div.mb-3
-          label.col-form-label(for='input-student'+i)= __('user.Matriculation number') +' '+i
-          div
-            input.form-control(
-              id='input-student'+i
-              type="text", 
-              name="students[]",
-              class= inputHasError('students'+(i-1)),
-              value= inputHasValue('students'+(i-1)),
-              minlength="11"
-            )
-            +errorBox('students'+(i-1))
+      div.row.mb-3
+        label.col-sm-2.col-form-label(for="input-date")= __('Grade on')
+        div.col-sm-10
+          input#input-date.form-control(
+            type="date", 
+            name="grade_date", 
+            class= inputHasError('grade_date'),
+            value= inputHasValue('grade_date'),
+            required
+          )
+          +errorBox('grade_date')
   
       button.btn.btn-primary(type="submit")= __('user.Add')
 

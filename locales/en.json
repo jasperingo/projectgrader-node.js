@@ -17,6 +17,8 @@
 
 	"Project" : "Project",
 	"Projects" : "Projects",
+	"Project Add" : "Project Add",
+	"Grade on" : "Grade on",
 	"No project found" : "No project found",
 
 	
@@ -40,12 +42,15 @@
        	"Add project" : "Add project",
       	"Update project" : "Update project",
 		"Student" : "Student", 
+		"Students" : "Students", 
 		"Administrator" : "Administrator",
 		"Head of Department" : "Head of Department",
 		"Internal Supervisor" : "Internal Supervisor",
 		"Internal Supervisor Email" : "Internal Supervisor Email",
 		"External Supervisor" : "External Supervisor",
+		"External Supervisor Email" : "External Supervisor Email",
 		"Matriculation Number" : "Matriculation Number",
+		"Project has been added" : "Project has been added",
 		"Student has been added" : "Student has been added",
 		"Head of Department has been added" : "Head of Department has been added",
 		"Internal Supervisor has been added" : "Internal Supervisor has been added",
@@ -58,8 +63,14 @@
 		"Email" : "Email is invalid.",
 		"required" : "Field is required.",
 		"Level is invalid" : "Level is invalid",
+		"Add at least one student" : "Add at least one student",
 		"Matriculation number is invalid" : "Matriculation number is invalid",
-		"credentials" : "The credentials you provided is incorrect."
+		"credentials" : "The credentials you provided is incorrect.",
+		"Student max projects" : "Student can't do more than 1 project per section", 
+		"Student IS department" : "Student and Internal Supervisor must be in the same department", 
+		"Internal Supervisor assigned" : "Internal Supervisor has already been assigned students.",
+		"Internal Supervisor min students" : "Internal Supervisor must have at least one student.",
+		"Internal Supervisor max students" : "Internal Supervisor can't have more than 10 students per section."
 	},
 
 

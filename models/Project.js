@@ -5,6 +5,51 @@ var { db } = require('../db');
 
 module.exports = class Project {
 
+	
+	constructor(student, internalSupervisor, section, department) {
+		this.student = student;
+		this.internalSupervisor = internalSupervisor;
+		this.section = section;
+		this.department = department;
+	}
+
+	save() {
+		return new Promise((resolve, reject) => {
+			db.query("INSERT INTO project (student_id, internal_supervisor_id, department, section) VALUES (?,?,?,?)", 
+				[this.student , this.internalSupervisor, this.department, this.section], 
+				(err, result) => {
+
+				if (err) reject(err);
+				else resolve(result);
+			});
+		});
+	}
+
+	static saveMany(values) {
+
+		var params = [];
+		var placeholders = '';
+
+		for (let i=0; i<values.length; i++) {
+			if (i > 0) placeholders += ', (?,?,?,?)';
+			params.push(values[i].student);
+			params.push(values[i].supervisor);
+			params.push(values[i].department);
+			params.push(values[i].section);
+		}
+
+		return new Promise((resolve, reject) => {
+			db.query(`INSERT INTO project (student_id, internal_supervisor_id, department, section) VALUES (?,?,?,?)${placeholders}`, 
+				params, 
+				(err, result) => {
+
+				if (err) reject(err);
+				else resolve(result);
+			});
+		});
+	}
+
+
 	static getStatus(project) {
 		let v = project.visitation_score;
 		let pw = project.paper_work_score;
@@ -32,7 +77,7 @@ module.exports = class Project {
 		return new Promise((resolve, reject) => {
 			db.query(sql, params, (err, results) => {
 				if (err) reject(err);
-				resolve(results.map(r=> r[column]));
+				else resolve(results.map(r=> r[column]));
 			});
 		});
 	}
@@ -58,7 +103,7 @@ module.exports = class Project {
 		return new Promise((resolve, reject) => {
 			db.query(sql, params, (err, results) => {
 				if (err) reject(err);
-				resolve(results.map(r=> r.section));
+				else resolve(results.map(r=> r.section));
 			});
 		});
 	}
@@ -105,25 +150,43 @@ module.exports = class Project {
 							a.department, a.visitation_score, a.paper_work_score, a.participation_score
 					FROM project AS a JOIN student AS b 
 					ON a.student_id = b.id
-					WHERE a.section = ? AND a.internal_supervisor_id = ?`, [section,supervisor], (err, results) => {
+					WHERE a.section = ? AND a.internal_supervisor_id = ?`, [section, supervisor], (err, results) => {
 
 
-				if (err) reject(err);
+				if (err) {
 
-				for (let k=0; k<results.length; k++) {
-					Project.getStatus(results[k]);
-				}
-						
-				//console.log(results);
-
+					reject(err);
 				
-				resolve(results);
-						
+				} else {
+
+					for (let k=0; k<results.length; k++) {
+						Project.getStatus(results[k]);
+					}
+							
+					//console.log(results);
+					
+					resolve(results);
+				}
+
 			});
 				
 
 		});
 
+	}
+
+	static findByStudentAndSection(student, section) {
+
+		return new Promise((resolve, reject) => {
+
+			db.query(`SELECT id FROM project WHERE section = ? AND student_id = ?`, [student, section], (err, results) => {
+
+				if (err) reject(err);
+				
+				else resolve(results[0]);
+
+			});
+		});
 	}
 
 
@@ -161,7 +224,7 @@ module.exports = class Project {
 
 			db.query(sql, params, (err, results) => {
 				if (err) reject(err);
-				resolve(results);
+				else resolve(results);
 			});
 
 		});
@@ -193,7 +256,7 @@ module.exports = class Project {
 			db.query(sql, params, (err, result) => {
 				//console.log(result.length);
 				if (err) reject(err);
-				resolve(result.length);
+				else resolve(result.length);
 			});
 
 		});

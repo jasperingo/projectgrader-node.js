@@ -19,7 +19,7 @@ module.exports = class IS {
 				(err, result) => {
 
 				if (err) reject(err);
-				resolve(result);
+				else resolve(result);
 			});
 		});
 	}
@@ -32,7 +32,7 @@ module.exports = class IS {
 				(err, result) => {
 
 				if (err) reject(err);
-				resolve(result);
+				else resolve(result);
 			});
 		});
 	}

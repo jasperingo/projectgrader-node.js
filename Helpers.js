@@ -73,11 +73,30 @@ function postFlasher (body, errs=[], form=null) {
 	var formData = {};
 
 	for (let [i, v] of inputs) {
-	    formData[i] = {value : v};
-	    for (let e of errs) {
-	    	if (i == e.param) {
-	    		formData[i].error = e.msg;
-		    }
+
+		if (Array.isArray(v)) {
+
+			var key = i.substring(0, i.length-2);
+
+			for (let j=0; j<v.length; j++) {
+				var x = key+j;
+				formData[x] = {value : v[j]};
+				for (let e of errs) {
+			    	if (x == e.param) {
+			    		formData[x].error = e.msg;
+				    }
+				}
+			}
+
+		} else {
+
+	    	formData[i] = {value : v};
+
+		    for (let e of errs) {
+		    	if (i == e.param) {
+		    		formData[i].error = e.msg;
+			    }
+			}
 		}
 	}
 
@@ -93,13 +112,28 @@ function postFlasher (body, errs=[], form=null) {
 }
 
 
+function getSectionArray() {
+	
+	var arr = [];
+
+	var year = new Date().getFullYear();
+
+	for (var i=year-1; i<year+1; i++) {
+	    arr.push(i+'/'+(i+1));
+	}
+
+	return arr;
+}
+
+
 
 module.exports = {
 	getPagination,
 	postFlasher,
 	hashPassword,
 	comparePassword,
-	sessionSetter
+	sessionSetter,
+	getSectionArray
 }
 
 
