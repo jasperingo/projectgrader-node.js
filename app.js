@@ -8,7 +8,7 @@ var session = require('express-session');
 var flash = require('connect-flash');
 var logger = require('morgan');
 var i18n = require('i18n');
-var { db } = require('./db');
+var { db } = require('./database/db');
 var MySQLStore = require('express-mysql-session')(session);
 
 
@@ -80,8 +80,9 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
 
+
+module.exports = app;
 
 
 

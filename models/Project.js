@@ -1,6 +1,6 @@
 'use strict'
 
-var { db } = require('../db');
+var { db } = require('../database/db');
 
 
 module.exports = class Project {
@@ -63,6 +63,48 @@ module.exports = class Project {
 		});
 	}
 
+	static preGrade(id, visitation, paper_work, participation) {
+
+		return new Promise((resolve, reject) => {
+			db.query(`UPDATE project SET visitation_score = ?, paper_work_score = ?, participation_score = ? WHERE id = ?`, 
+				[visitation, paper_work, participation, id], 
+				(err, result) => {
+
+				if (err) reject(err);
+				else resolve(result);
+				console.log(result)
+			});
+		});
+	}
+
+	static ISGrade(id, grade) {
+
+		return new Promise((resolve, reject) => {
+			db.query(`UPDATE project SET internal_score = ? WHERE id = ?`, 
+				[grade, id], 
+				(err, result) => {
+
+				if (err) reject(err);
+				else resolve(result);
+				console.log(result)
+			});
+		});
+	}
+	
+	static ESGrade(id, grade) {
+
+		return new Promise((resolve, reject) => {
+			db.query(`UPDATE project SET external_score = ? WHERE id = ?`, 
+				[grade, id], 
+				(err, result) => {
+
+				if (err) reject(err);
+				else resolve(result);
+				console.log(result)
+			});
+		});
+	}
+
 
 	static getStatus(project) {
 		let v = project.visitation_score;
@@ -86,6 +128,7 @@ module.exports = class Project {
 							b.name AS student_name, 
 							b.matric_number AS student_matric_number, 
 							b.level AS student_level,
+							a.internal_supervisor_id, 
 							a.external_supervisor_id, 
 							a.grade_at, a.section, 
 							a.department, 
@@ -112,7 +155,7 @@ module.exports = class Project {
 				
 				} else {
 
-					Project.getStatus(results[0]);
+					if (results[0]) Project.getStatus(results[0]);
 							
 					console.log(results);
 					

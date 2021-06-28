@@ -8,6 +8,7 @@
 	"Next": "Next",
 	"Previous" : "Previous",
 	"Search" : "Search",
+	"Status" : "Status",
 	"View" : "View",
 	"Status" : "Status",
 	"Section" : "Section", 
@@ -30,6 +31,8 @@
 	"Failed" : "Failed",
 	"No project found" : "No project found",
 	"Not set" : "Not set",
+	"Project not found" : "Oops! Project do not exist.",
+	"Project forbidden" : "You don't have access to this project.",
 
 	
 	"user": {
@@ -70,13 +73,16 @@
 		"External Supervisor has been added" : "External Supervisor has been added"
 	},
 
+
 	"errors-msgs" : {
+		"Score invalid" : "Score is invalid.",
 		"Visitation score failed" : "Visitation score is below 75%",
 		"Paper work score failed" : "Paper work is not up to standard",
 		"Participation score failed" : "Did not participate in project work",
 		"Grading date" : "You cannot grade this student until the grading date",
 		"No grading" : "Student has not yet been graded",
-		"External grading not allowed" : "You cannot grade this student because",
+		"External grading not allowed failed" : "You cannot grade this student because",
+		"External grading not allowed pending" : "You cannot grade this student because he/she hasn't been clear by the Internal Supervisor.",
 		"unknown" : "Oop! there was an error.",
 		"Password length" : "Password must be more than 5 characters.",
 		"Email" : "Email is invalid.",

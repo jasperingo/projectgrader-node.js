@@ -20,6 +20,12 @@ router.post('/update', auth('admin', false), Project.postUpdate);
 
 router.get('/:id', auth(['hod', 'is', 'es'], false), Project.index);
 
+router.post('/:id/isgrade', auth('is', false), Project.ISGrade);
+
+router.post('/:id/ispregrade', auth('is', false), Project.ISPreGrade);
+
+router.post('/:id/esgrade', auth('es', false), Project.ESGrade);
+
 
 module.exports = router;
 

@@ -18,9 +18,24 @@ exports.index = async function (req, res, next) {
 
 		var data = await Project.findById(req.params.id);
 
+		if (!data) {
+			var ee = new Error(res.__('Project not found'));
+			ee.status = 404;
+			throw ee;
+		}
+
+		if ((req.session.user.type == 'hod' && data.department != req.session.user.department) ||
+			(req.session.user.type == 'is' && data.internal_supervisor_id != req.session.user.id) ||
+			(req.session.user.type == 'es' && data.external_supervisor_id != req.session.user.id)) {
+			var ee = new Error(res.__('Project forbidden'));
+			ee.status = 403;
+			throw ee;
+		}
+
 		res.render('project', {
 			title : `${res.__('Project')} ${req.params.id}`,
-			user : req.session.user,
+			user : req.session.user, 
+			form_data : req.flash('form_data')[0], 
 			data,
 
 		});
@@ -31,6 +46,226 @@ exports.index = async function (req, res, next) {
 	}
 
 }
+
+
+exports.ISPreGrade = [
+
+	function (req, res, next) {
+		
+	  	if (!req.body.participation) req.body.participation = 0;
+
+	  	if (!req.body.paper_work) req.body.paper_work = 0;
+
+	    next();
+	    
+	}, 
+	
+	body('visitation').trim().isFloat({ min : 0, max : 100 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
+
+	body('paper_work').trim().isInt({ min : 0, max : 1 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
+
+	body('participation').trim().isInt({ min : 0, max : 1 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
+
+	function (req, res, next) {
+
+	  	var errors = validationResult(req);
+	  	
+	    if (!errors.isEmpty()) {
+
+	    	req.flash('form_data', postFlasher(req.body, errors.array()));
+
+	    	res.redirect('/project/'+req.params.id+'#grade-form');
+	    	
+	    } else {
+
+	    	next();
+	    }
+	},
+	
+	async function (req, res, next) {
+	
+		try {
+
+			var data = await Project.findById(req.params.id);
+
+			if (!data) {
+
+				var ee = new Error(res.__('Project not found'));
+				ee.status = 404;
+				next(ee);
+
+			} else if ((req.session.user.type != 'is' || 
+				(req.session.user.type == 'is' && data.internal_supervisor_id != req.session.user.id)) || 
+				data.status > 0) {
+				
+				var ee = new Error(res.__('Project forbidden'));
+				ee.status = 403;
+				next(ee);
+			
+			} else {
+
+				var result = await Project.preGrade(
+			  		req.params.id, 
+			  		req.body.visitation, 
+			  		req.body.paper_work, 
+					req.body.participation
+			  	);
+
+				if (result.affectedRows > 0)
+					res.redirect('/project/'+req.params.id);
+				else 
+					throw new Error();
+
+			}
+
+		} catch (error) {
+
+			req.flash('form_data', postFlasher(req.body, [], { error : req.__('errors-msgs.unknown') }));
+
+			res.redirect('/project/'+req.params.id+'#grade-form');
+
+			console.log(error);
+		}
+
+	}
+];
+
+
+
+exports.ISGrade = [
+
+	body('grade').trim().isFloat({ min : 0, max : 40 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
+
+	function (req, res, next) {
+
+	  	var errors = validationResult(req);
+	  	
+	    if (!errors.isEmpty()) {
+
+	    	req.flash('form_data', postFlasher(req.body, errors.array()));
+
+	    	res.redirect('/project/'+req.params.id+'#grade-form');
+	    	
+	    } else {
+
+	    	next();
+	    }
+	},
+	
+
+	async function (req, res, next) {
+		
+		try {
+
+			var data = await Project.findById(req.params.id);
+
+			if (!data) {
+
+				var ee = new Error(res.__('Project not found'));
+				ee.status = 404;
+				next(ee);
+
+			} else if ((req.session.user.type != 'is' || 
+				(req.session.user.type == 'is' && data.internal_supervisor_id != req.session.user.id)) || 
+				data.status < 1) {
+				
+				var ee = new Error(res.__('Project forbidden'));
+				ee.status = 403;
+				next(ee);
+			
+			} else {
+
+				var result = await Project.ISGrade(
+			  		req.params.id, 
+			  		req.body.grade
+			  	);
+
+				if (result.affectedRows > 0)
+					res.redirect('/project/'+req.params.id);
+				else 
+					throw new Error();
+
+			}
+
+		} catch (error) {
+
+			req.flash('form_data', postFlasher(req.body, [], { error : req.__('errors-msgs.unknown') }));
+
+			res.redirect('/project/'+req.params.id+'#grade-form');
+
+			console.log(error);
+		}
+	}
+];
+
+
+exports.ESGrade = [
+
+	body('grade').trim().isFloat({ min : 0, max : 60 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
+
+	function (req, res, next) {
+
+	  	var errors = validationResult(req);
+	  	
+	    if (!errors.isEmpty()) {
+
+	    	req.flash('form_data', postFlasher(req.body, errors.array()));
+
+	    	res.redirect('/project/'+req.params.id+'#grade-form');
+	    	
+	    } else {
+
+	    	next();
+	    }
+	},
+	
+
+	async function (req, res, next) {
+		
+		try {
+
+			var data = await Project.findById(req.params.id);
+
+			if (!data) {
+
+				var ee = new Error(res.__('Project not found'));
+				ee.status = 404;
+				next(ee);
+
+			} else if ((req.session.user.type != 'es' || 
+				(req.session.user.type == 'es' && data.external_supervisor_id != req.session.user.id)) || 
+				data.status < 2 ||
+				(data.grade_at == null || new Date(data.grade_at).getTime() > Date.now())) {
+				
+				var ee = new Error(res.__('Project forbidden'));
+				ee.status = 403;
+				next(ee);
+			
+			} else {
+
+				var result = await Project.ESGrade(
+			  		req.params.id, 
+			  		req.body.grade
+			  	);
+
+				if (result.affectedRows > 0)
+					res.redirect('/project/'+req.params.id);
+				else 
+					throw new Error();
+
+			}
+
+		} catch (error) {
+
+			req.flash('form_data', postFlasher(req.body, [], { error : req.__('errors-msgs.unknown') }));
+
+			res.redirect('/project/'+req.params.id+'#grade-form');
+
+			console.log(error);
+		}
+	}
+];
+
 
 
 

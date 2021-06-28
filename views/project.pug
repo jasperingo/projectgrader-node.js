@@ -18,9 +18,18 @@ block content
   
   include input_mixins
 
-  -function isset(v, c) { return v ? c ? c(v) : v : __('Not set'); }
+  -function isset(v, c) { return v != undefined ? (c ? c(v) : v) : __('Not set'); }
 
   -function isPassed(v) { return v == 1 ? __('Passed') : __('Failed'); }
+
+  -
+    function formatDate(v) {
+      var date = new Date(v);
+      var d = (date.getDate() < 10 ? '0'+date.getDate() : date.getDate());
+      var m = (date.getMonth()+1);
+      m = m < 10 ? '0'+m : m;
+      return d+'-'+m+'-'+date.getFullYear();
+    }
 
   div.border-bottom.border-1.border-secondary.py-5
 
@@ -42,7 +51,7 @@ block content
 
         +listItem('user.External Supervisor', isset(data.external_supervisor_name))
 
-        +listItem('Grading date', data.grade_at? data.grade_at : __('Not set'))
+        +listItem('Grading date', isset(data.grade_at, formatDate))
 
         if user.type != 'es'
 
@@ -50,7 +59,7 @@ block content
 
           +listItem('Paper work score', isset(data.paper_work_score, isPassed))
 
-          +listItem('Participation score', isset(data.participation_scoreisPassed))
+          +listItem('Participation score', isset(data.participation_score, isPassed))
   
 
   div
@@ -66,7 +75,8 @@ block content
 
 
       if (user.type == 'is' && data.status == 0)
-        form.my-5(method="POST", action="")
+        form#grade-form.my-5(method="POST", action=data.id+'/ispregrade')
+          +formMsg()
           div.mb-3
             label.col-form-label(for="input-visitaion")= __('Visitation score')
             input#input-visitaion.form-control(
@@ -75,51 +85,65 @@ block content
               class= inputHasError('visitation'),
               value= inputHasValue('visitation'),
               min="0",
-              max="100"
+              max="100",
+              step="0.1",
               required
             )
+            +errorBox('visitation')
 
           div.form-check.mb-3
-            input#input-paper-work.form-check-input(type="checkbox", value="", name="paper_work", required)
+            input#input-paper-work.form-check-input(type="checkbox", value=1, name="paper_work", class= inputHasError('paper_work'))
             label.form-check-label(for="input-paper-work")= __('Paper work is up to standard')
+            +errorBox('paper_work')
 
           div.form-check.mb-3
-            input#input-participation.form-check-input(type="checkbox", value="", name="participation", required)
+            input#input-participation.form-check-input(type="checkbox", value=1, name="participation", class= inputHasError('participation'))
             label.form-check-label(for="input-participation")= __('Participated in project work')
+            +errorBox('participation')
   
         
           button.btn.btn-primary(type="submit")= __('Grade')
 
-
-      if ((user.type == 'is' && data.internal_score == null) || (user.type == 'es' && data.external_score == null))
-        form.my-5(method="POST", action="")
+      -var timeBad = (data.grade_at == null || new Date(data.grade_at).getTime() > Date.now());
+      
+      if ((user.type == 'is' && data.internal_score == null && data.status > 0) || (user.type == 'es' && data.external_score == null && !timeBad && data.status > 1))
+        form#grade-form.my-5(method="POST", action=data.id+'/'+user.type+'grade')
+          +formMsg()
           div.input-group
             input#input-grade.form-control(
               type="number", 
               name="grade", 
               class= inputHasError('grade'),
               value= inputHasValue('grade'),
-              placeholder= __('Grade student')
+              placeholder= __('Grade student'),
               min="0",
-              max="40"
+              max=user.type=='is'?40:60,
+              step="0.1",
               required
             )
             button.btn.btn-primary(type="submit")= __('Grade')
+            +errorBox('grade')
 
-      -var timeBad = (data.grade_at == null || new Date(data.grade_at).getTime() > Date.now());
 
       if user.type == 'es' && timeBad
         div.alert.alert-danger.text-center.py-5(role="alert")= __('errors-msgs.Grading date')
       
+      if user.type == 'es' && data.status == 0 && !timeBad
+        div.alert.alert-danger.text-center.py-5(role="alert")= __('errors-msgs.External grading not allowed pending')
+
+
       if user.type == 'es' && data.status == 1 && !timeBad
         div.alert.alert-danger.text-center.py-5(role="alert")
 
-        h3= __('errors-msgs.External grading not allowed')
+          h3= __('errors-msgs.External grading not allowed failed')
 
-        ul
-          li= __('errors-msgs.Visitation score failed')
-          li= __('errors-msgs.Paper work score failed')
-          li= __('errors-msgs.Participation score failed')
+          ul
+            if data.visitation_score < 75
+              li= __('errors-msgs.Visitation score failed')
+            if data.paper_work_score == 0
+              li= __('errors-msgs.Paper work score failed')
+            if data.participation_score == 0
+              li= __('errors-msgs.Participation score failed')
 
 
 

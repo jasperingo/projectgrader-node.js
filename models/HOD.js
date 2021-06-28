@@ -1,6 +1,6 @@
 'use strict'
 
-var { db } = require('../db');
+var { db } = require('../database/db');
 
 
 module.exports = class HOD {

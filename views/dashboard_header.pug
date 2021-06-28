@@ -3,10 +3,12 @@
 div.bg-dark.text-light.py-5
     
   div.container
-      
+    
+    h2.text-uppercase.fw-bold= title
+
     div.row.align-items-stretch
 
-      h2.col-md-8 #{__('Welcome')}, #{user.name}
+      h3.col-md-8 #{__('Welcome')}, #{user.name} 
       
       if (user.role != 'admin')
         form.col-md-4(method="GET", action="")
