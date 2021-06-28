@@ -18,15 +18,10 @@ router.get('/login', auth('admin', true), Admin.getLogin);
 router.post('/login', auth('admin', true), Admin.postLogin);
 
 
-router.post('/logout', auth('admin', false), Admin.postLogOut);
-
-
 router.get('/add-student', auth('admin', false), Admin.getAddStudent);
 
 
 router.post('/add-student', auth('admin', false), Admin.postAddStudent);
-
-
 
 
 

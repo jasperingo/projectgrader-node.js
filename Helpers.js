@@ -15,8 +15,29 @@ function comparePassword(plain, hash) {
 
 
 
-function getPagination(page, maxPages, url) {
+function getPagination(req, contentCount) {
 	
+	var page = req.pager.page;
+
+	var maxPages = Math.ceil(contentCount/req.pager.limit);
+
+	var i = 0;
+
+	var url = `${req.baseUrl}${req.path}`;
+
+	var values = Object.entries(req.query);
+
+	for (var [x, v] of values) {
+
+		if (x == 'page') continue;
+
+		url += ((i == 0) ? `?${x}=${v}` : `&${x}=${v}`);
+
+		i++;
+	}
+
+	url += ((i == 0) ? '?page=' : '&page=');
+
 	var data = { page, url };
 
 	
@@ -59,9 +80,11 @@ function getPagination(page, maxPages, url) {
 
 
 function sessionSetter(req, type, data) {
-	req.session[type] = { 
+	req.session.user = { 
+		type,
   	 	id : data.id,
-  	 	name : data.name
+  	 	name : data.name,
+  	 	department : data.department
   	};
 }
 

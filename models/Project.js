@@ -49,6 +49,20 @@ module.exports = class Project {
 		});
 	}
 
+	static updateMany(supervisor, date, department, section) {
+
+		return new Promise((resolve, reject) => {
+			db.query(`UPDATE project SET external_supervisor_id = ?, grade_at = ? WHERE department = ? AND section = ?`, 
+				[supervisor, date, department, section], 
+				(err, result) => {
+
+				if (err) reject(err);
+				else resolve(result);
+				console.log(result)
+			});
+		});
+	}
+
 
 	static getStatus(project) {
 		let v = project.visitation_score;
@@ -63,6 +77,53 @@ module.exports = class Project {
 		}
 	}
 
+	static findById(id) {
+
+		return new Promise((resolve, reject) => {
+
+			db.query(`SELECT a.id, 
+							a.student_id, 
+							b.name AS student_name, 
+							b.matric_number AS student_matric_number, 
+							b.level AS student_level,
+							a.external_supervisor_id, 
+							a.grade_at, a.section, 
+							a.department, 
+							a.internal_score,
+							a.external_score,
+							a.visitation_score, 
+							a.paper_work_score, 
+							a.participation_score,
+							c.name AS internal_supervisor_name,
+							d.name AS external_supervisor_name
+					FROM project AS a 
+						JOIN student AS b 
+							ON a.student_id = b.id 
+						JOIN internal_supervisor AS c 
+							ON a.internal_supervisor_id = c.id 
+						LEFT JOIN external_supervisor AS d 
+							ON a.external_supervisor_id = d.id
+					WHERE a.id = ?`, [id], (err, results) => {
+
+
+				if (err) {
+
+					reject(err);
+				
+				} else {
+
+					Project.getStatus(results[0]);
+							
+					console.log(results);
+					
+					resolve(results[0]);
+				}
+
+			});
+				
+
+		});
+	}
 
 	static findAllDistinct(column, limit) {
 
@@ -82,22 +143,26 @@ module.exports = class Project {
 		});
 	}
 
-	static findSectionsByExternalSupervisor(supervisor, limit) {
-		return Project.findSectionsBySupervisor('external_supervisor_id', supervisor, limit);
-	}
-
 	static findSectionsByInternalSupervisor(supervisor, limit) {
-		return Project.findSectionsBySupervisor('internal_supervisor_id', supervisor, limit);
+		var sql = `SELECT DISTINCT section FROM project WHERE internal_supervisor_id = ? ORDER BY created_at DESC`;
+		return Project.findSections(sql, [supervisor], limit);
 	}
 
-	static findSectionsBySupervisor(type, supervisor, limit) {
+	static findSectionsByExternalSupervisor(supervisor, limit) {
+		var sql = `SELECT DISTINCT section FROM project WHERE external_supervisor_id = ? ORDER BY created_at DESC`;
+		return Project.findSections(sql, [supervisor], limit);
+	}
 
-		var sql = `SELECT DISTINCT section FROM project WHERE ${type} ORDER BY created_at DESC`;
-		var params = [supervisor];
+	static findSectionsByDepartment(department, limit) {
+		var sql = `SELECT DISTINCT section FROM project WHERE department = ? ORDER BY created_at DESC`;
+		return Project.findSections(sql, [department], limit);
+	}
+
+	static findSections(sql, params, limit) {
 
 		if (limit) {
 			sql += ' LIMIT ?, ?';
-			params = [supervisor, ...limit];
+			params = [params, ...limit];
 		}
 
 		return new Promise((resolve, reject) => {
@@ -124,8 +189,12 @@ module.exports = class Project {
 
 		return new Promise((resolve, reject) => {
 
-			for (let i=0; i<results.length; i++) {
-				Project.findAllBySectionAndInternalSupervisor(section,  results[i].supervisor_id)
+			if (results.length == 0) {
+				resolve(results);
+			} else {
+
+				for (let i=0; i<results.length; i++) {
+					Project.findAllBySectionAndInternalSupervisor(section,  results[i].supervisor_id)
 					.then((projects) => {
 
 						results[i].projects = projects;
@@ -135,6 +204,8 @@ module.exports = class Project {
 						}
 					})
 					.catch(err=>err);		
+				}
+
 			}
 
 		});
@@ -147,7 +218,8 @@ module.exports = class Project {
 
 				
 			db.query(`SELECT a.id, a.student_id, b.name AS student_name, b.matric_number AS student_matric_number, 
-							a.department, a.visitation_score, a.paper_work_score, a.participation_score
+							a.external_supervisor_id, a.grade_at, a.section, a.department, a.visitation_score, 
+							a.paper_work_score, a.participation_score
 					FROM project AS a JOIN student AS b 
 					ON a.student_id = b.id
 					WHERE a.section = ? AND a.internal_supervisor_id = ?`, [section, supervisor], (err, results) => {
@@ -218,13 +290,14 @@ module.exports = class Project {
 			params = [...params, ...limit];
 		}
 
-		console.log(params);
+		//console.log(params);
 
 		return new Promise((resolve, reject) => {
 
 			db.query(sql, params, (err, results) => {
 				if (err) reject(err);
 				else resolve(results);
+				//console.log(results)
 			});
 
 		});

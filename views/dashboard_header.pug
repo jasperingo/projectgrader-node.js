@@ -17,7 +17,7 @@ div.bg-dark.text-light.py-5
                 option(value=d selected=(d==section?true:false))=d
             button.btn.btn-primary(type="submit")= __('Search')
   
-    form.mt-3(method="POST", action='/'+user.role+'/logout')
+    form.mt-3(method="POST", action='/logout')
       div.input-group
         button.btn.btn-danger(type="submit")= __('user.Log out')
 

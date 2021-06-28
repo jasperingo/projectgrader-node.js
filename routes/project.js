@@ -18,11 +18,10 @@ router.get('/update', auth('admin', false), Project.getUpdate);
 router.post('/update', auth('admin', false), Project.postUpdate);
 
 
-router.get('/:id', auth('es', true), Project.index);
+router.get('/:id', auth(['hod', 'is', 'es'], false), Project.index);
 
 
 module.exports = router;
-
 
 
 

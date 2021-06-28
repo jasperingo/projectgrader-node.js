@@ -2,7 +2,7 @@
 
 var HOD = require('../models/HOD');
 var Project = require('../models/Project');
-var { getPagination, postFlasher, hashPassword } = require('../Helpers');
+var { getPagination, postFlasher, hashPassword, comparePassword, sessionSetter } = require('../Helpers');
 
 var { body, validationResult } = require('express-validator');
 
@@ -12,32 +12,21 @@ exports.index = async function (req, res, next) {
 	
 	try {
 
-		var sections = await Project.findAllDistinct('section');
+		var sections = await Project.findSectionsByDepartment(req.session.user.department);
 
-		var section = sections[0];
+		var section = (!req.query.fsection) ? sections[0] : req.query.fsection;
 
-		if (req.query.fsection && sections.indexOf(req.query.fsection) > -1) {
-			section = req.query.fsection;
-			var pageUrl = `${req.baseUrl}${req.path}?fsection=${section}&page=`;
-		} else {
-			var pageUrl = `${req.baseUrl}${req.path}?page=`;
-		}
+		var data = await Project.findAllBySectionAndDepartment(section, req.session.user.department, req.pager.pagination);
 
-		// filter by hod department
-
-		var data = await Project.findAllBySection(section, req.myPager[1]);
-
-		var count = await Project.countAllBySection(section);
-
-		//console.log(req.myPager);
+		var count = await Project.countAll({ section, department : req.session.user.department });
 		
 		res.render('hod_dashboard', {
 		    title: res.__('user.Head of Department'),
-		    user : { name : 'Prof. Biscuit Half' },
+		    user : req.session.user,
 		    sections: sections,
 		    section: section,
 		    data: data,
-		    pagination: getPagination(req.myPager[0], Math.ceil(count/req.myPager[1][1]), pageUrl),
+		    pagination: getPagination(req, count),
 		});
 
 	} catch (error) {
@@ -46,44 +35,45 @@ exports.index = async function (req, res, next) {
 }
 
 
-exports.getLogin = function (req, res) {
+exports.getLogin = async function (req, res) {
 	
-	res.render('hod_login', {
-	    title : res.__('user.{{ name }} Login', { name : res.__('user.Head of Department')}),
-	    input_errors : req.flash('login_errors')
-	});
+	try {
+
+		res.render('hod_login', {
+		    title : res.__('user.{{ name }} Login', { name : res.__('user.Head of Department')}),
+		    form_data : req.flash('form_data')[0],
+		    departments : await HOD.findDepartments()
+		});
+
+	} catch (error) {
+		throw error;
+	}
 }
 
-// send back user input
-// flash errors and input values in function.
+
 exports.postLogin = async function (req, res) {
-	
-  	var department = req.__('departments-array')[req.body.department];
 
   	try {
   		
-  		var result = await HOD.findByDepartment(department);
+  		var result = await HOD.findByDepartment(req.body.department);
 
-  		if (!result || result.password !== req.body.password) {
+  		if (!result || !await comparePassword(req.body.password, result.password)) {
   			
-  			req.flash('login_errors', res.__('errors-msgs.credentials'));
+  			req.flash('form_data', postFlasher(req.body, [], { error : res.__('errors-msgs.credentials') }));
   	 		res.redirect('login');
   	 	
   	 	} else {
 
-  	 		req.session.hod = { 
-  	 			id : result.id,
-  	 			name : result.name
-  	 		};
+  	 		sessionSetter(req, 'hod', result);
 
   	 		res.redirect('./');
 
-  			console.log(result);
+  			//console.log(result);
   	 	}
 
   	} catch (error) {
 
-  		req.flash('login_errors', res.__('errors-msgs.unknown'));
+  		req.flash('form_data', postFlasher(req.body, [], { error : res.__('errors-msgs.unknown') }));
   		res.redirect('login');
   		console.log(error);
   	}
@@ -99,7 +89,6 @@ exports.getAdd = function (req, res) {
 	    form_data : req.flash('form_data')[0]
 	});
 }
-
 
 
 exports.postAdd = [

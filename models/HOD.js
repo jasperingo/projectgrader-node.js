@@ -42,6 +42,16 @@ module.exports = class HOD {
 		
 	}
 
+	static findDepartments() {
+
+		return new Promise((resolve, reject) => {
+			db.query("SELECT department FROM hod", (err, result) => {
+				if (err) reject(err);
+				else resolve(result.map(i => i.department));
+			});
+		});
+	}
+	
 	static findById(id) {
 
 		return new Promise((resolve, reject) => {

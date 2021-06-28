@@ -1,0 +1,150 @@
+
+extends layout
+
+mixin listItem(t, b)
+  div.row.border-bottom.border-1.border-light.py-2
+    dt.col-sm-4= __(t)
+    dd.col-sm-8= b
+
+mixin scoreBoard(score, from)
+  li.pb-4(class=user.type == 'hod' ? 'col-md-6' : '')
+    div.card.bg-success.text-white
+      div.card-body.py-3.text-center
+        h3.fs-1= score
+        h5.text-uppercase= __(from)
+
+
+block content
+  
+  include input_mixins
+
+  -function isset(v, c) { return v ? c ? c(v) : v : __('Not set'); }
+
+  -function isPassed(v) { return v == 1 ? __('Passed') : __('Failed'); }
+
+  div.border-bottom.border-1.border-secondary.py-5
+
+    div.container
+
+      dl
+        
+        +listItem('user.Name', data.student_name)
+
+        +listItem('user.Matriculation Number', data.student_matric_number)
+
+        +listItem('user.Department', data.department)
+
+        +listItem('section', data.section)
+
+        +listItem('user.Level', data.student_level+' '+__('user.Level'))
+
+        +listItem('user.Internal Supervisor', data.internal_supervisor_name)
+
+        +listItem('user.External Supervisor', isset(data.external_supervisor_name))
+
+        +listItem('Grading date', data.grade_at? data.grade_at : __('Not set'))
+
+        if user.type != 'es'
+
+          +listItem('Visitation score', isset(data.visitation_score))
+
+          +listItem('Paper work score', isset(data.paper_work_score, isPassed))
+
+          +listItem('Participation score', isset(data.participation_scoreisPassed))
+  
+
+  div
+
+    div.container
+
+      ul.row.list-unstyled.mt-5
+        if user.type != 'es'
+          +scoreBoard(isset(data.internal_score), 'user.Internal Supervisor score')
+        
+        if user.type != 'is'
+          +scoreBoard(isset(data.external_score), 'user.External Supervisor score')
+
+
+      if (user.type == 'is' && data.status == 0)
+        form.my-5(method="POST", action="")
+          div.mb-3
+            label.col-form-label(for="input-visitaion")= __('Visitation score')
+            input#input-visitaion.form-control(
+              type="number", 
+              name="visitation", 
+              class= inputHasError('visitation'),
+              value= inputHasValue('visitation'),
+              min="0",
+              max="100"
+              required
+            )
+
+          div.form-check.mb-3
+            input#input-paper-work.form-check-input(type="checkbox", value="", name="paper_work", required)
+            label.form-check-label(for="input-paper-work")= __('Paper work is up to standard')
+
+          div.form-check.mb-3
+            input#input-participation.form-check-input(type="checkbox", value="", name="participation", required)
+            label.form-check-label(for="input-participation")= __('Participated in project work')
+  
+        
+          button.btn.btn-primary(type="submit")= __('Grade')
+
+
+      if ((user.type == 'is' && data.internal_score == null) || (user.type == 'es' && data.external_score == null))
+        form.my-5(method="POST", action="")
+          div.input-group
+            input#input-grade.form-control(
+              type="number", 
+              name="grade", 
+              class= inputHasError('grade'),
+              value= inputHasValue('grade'),
+              placeholder= __('Grade student')
+              min="0",
+              max="40"
+              required
+            )
+            button.btn.btn-primary(type="submit")= __('Grade')
+
+      -var timeBad = (data.grade_at == null || new Date(data.grade_at).getTime() > Date.now());
+
+      if user.type == 'es' && timeBad
+        div.alert.alert-danger.text-center.py-5(role="alert")= __('errors-msgs.Grading date')
+      
+      if user.type == 'es' && data.status == 1 && !timeBad
+        div.alert.alert-danger.text-center.py-5(role="alert")
+
+        h3= __('errors-msgs.External grading not allowed')
+
+        ul
+          li= __('errors-msgs.Visitation score failed')
+          li= __('errors-msgs.Paper work score failed')
+          li= __('errors-msgs.Participation score failed')
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

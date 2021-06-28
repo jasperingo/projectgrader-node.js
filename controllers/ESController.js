@@ -3,7 +3,7 @@
 
 var ES = require('../models/ES');
 var Project = require('../models/Project');
-var { getPagination, postFlasher, hashPassword } = require('../Helpers');
+var { getPagination, postFlasher, hashPassword, comparePassword, sessionSetter  } = require('../Helpers');
 
 var { body, validationResult } = require('express-validator');
 
@@ -13,28 +13,21 @@ exports.index = async function (req, res, next) {
 	
 	try {
 
-		var sections = await Project.findSectionsByExternalSupervisor(1);
+		var sections = await Project.findSectionsByExternalSupervisor(req.session.user.id);
 
-		var section = sections[0];
+		var section = (!req.query.fsection) ? sections[0] : req.query.fsection;
 
-		if (req.query.fsection && sections.indexOf(req.query.fsection) > -1) {
-			section = req.query.fsection;
-			var pageUrl = `${req.baseUrl}${req.path}?fsection=${section}&page=`;
-		} else {
-			var pageUrl = `${req.baseUrl}${req.path}?page=`;
-		}
+		var data = await Project.findAllBySectionAndExternalSupervisor(section, req.session.user.id, req.pager.pagination);
 
-		var data = await Project.findAllBySectionAndExternalSupervisor(section, 1, req.myPager[1]);
-
-		var count = await Project.countAll({section});
+		var count = await Project.countAll({ section, externalSupervisor: req.session.user.id });
 		
 		res.render('es_dashboard', {
 		    title: res.__('user.External Supervisor'),
-		    user : { name : 'Prof. Biscuit Half' },
+		    user : req.session.user,
 		    sections: sections,
 		    section: section,
 		    data: data,
-		    pagination: getPagination(req.myPager[0], Math.ceil(count/req.myPager[1][1]), pageUrl),
+		    pagination: getPagination(req, count),
 		});
 
 	} catch (error) {
@@ -45,13 +38,10 @@ exports.index = async function (req, res, next) {
 
 exports.getLogin = function (req, res) {
 
-	var input_values = req.flash('login_values')[0];
-
 	res.render('supervisor_login', {
 	    title : res.__('user.{{ name }} Login', { name : res.__('user.External Supervisor')}),
 	    supervisor_type : res.__('user.External Supervisor'),
-	    input_errors : req.flash('login_errors'),
-	    input_values : input_values ? input_values : ''
+	   	form_data : req.flash('form_data')[0],
 	});
 }
 
@@ -62,18 +52,14 @@ exports.postLogin = async function (req, res) {
   		
   		var result = await ES.findByEmail(req.body.email);
 
-  		if (!result || result.password !== req.body.password) {
+  		if (!result || !await comparePassword(req.body.password, result.password)) {
   			
-  			req.flash('login_errors', res.__('errors-msgs.credentials'));
-  			req.flash('login_values', { email: req.body.email });
+  			req.flash('form_data', postFlasher(req.body, [], { error : res.__('errors-msgs.credentials') }));
   	 		res.redirect('login');
   	 	
   	 	} else {
 
-  	 		req.session.es = { 
-  	 			id : result.id,
-  	 			name : result.name
-  	 		};
+  	 		sessionSetter(req, 'es', result);
 
   	 		res.redirect('./');
 
@@ -81,9 +67,8 @@ exports.postLogin = async function (req, res) {
   	 	}
 
   	} catch (error) {
-
-  		req.flash('login_errors', res.__('errors-msgs.unknown'));
-  		req.flash('login_values', { email: req.body.email });
+  		
+  		req.flash('form_data', postFlasher(req.body, [], { error : res.__('errors-msgs.unknown') }));
   		res.redirect('login');
   		console.log(error);
   	}

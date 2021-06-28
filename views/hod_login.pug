@@ -1,31 +1,34 @@
 extends layout
 
 block content
+
+  include input_mixins
   
   div.container
 
     form.common-form.mx-auto.my-5.p-5.bg-light.rounded(method="POST" action="login")
 
-      svg.svg-small.d-block.my-2.m-auto(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512")
-        path(d="M224 256A128 128 0 1 0 96 128a128 128 0 0 0 128 128zm96 64a63.08 63.08 0 0 1 8.1-30.5c-4.8-.5-9.5-1.5-14.5-1.5h-16.7a174.08 174.08 0 0 1-145.8 0h-16.7A134.43 134.43 0 0 0 0 422.4V464a48 48 0 0 0 48 48h280.9a63.54 63.54 0 0 1-8.9-32zm288-32h-32v-80a80 80 0 0 0-160 0v80h-32a32 32 0 0 0-32 32v160a32 32 0 0 0 32 32h224a32 32 0 0 0 32-32V320a32 32 0 0 0-32-32zM496 432a32 32 0 1 1 32-32 32 32 0 0 1-32 32zm32-144h-64v-80a32 32 0 0 1 64 0z")
+      include login_icon
       
       h3.text-center.text-uppercase.mb-3= __('user.Head of Department')
       
-      if input_errors != ''
-        div.alert.alert-danger(role="alert")= input_errors
+      +formMsg()
       
       div.row.mb-3
         label.col-sm-2.col-form-label(for="input-department")= __('user.Department')
         div.col-sm-10
-          select#input-department.form-select(name="department")
-            - var depts = __('departments-array');
-            each d, i in depts
-              option(value=i selected=(i==0?true:false))=d
+          select#input-department.form-select(name="department", required)
+            option(value="")=__('Choose a department')
+            each d in departments
+              option(
+                value= d,
+                selected= selectHasValue('department', d)
+              )= d
       
       div.row.mb-3
         label.col-sm-2.col-form-label(for="input-password")= __('user.Password')
         div.col-sm-10
-          input#input-password.form-control(type="password", name="password")
+          input#input-password.form-control(type="password", name="password", minlength="6" required)
   
       button.btn.btn-primary(type="submit")= __('user.Login')
 

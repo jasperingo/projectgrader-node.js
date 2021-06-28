@@ -7,7 +7,7 @@ block content
   
   div.container
 
-    form.common-form.mx-auto.my-5.p-5.bg-light.rounded(method="POST" action="add")
+    form.common-form.mx-auto.my-5.p-5.bg-light.rounded(method="POST" action="update")
 
       include project_icon
       
@@ -61,7 +61,7 @@ block content
           +errorBox('section')
       
       div.row.mb-3
-        label.col-sm-2.col-form-label(for="input-date")= __('Grade on')
+        label.col-sm-2.col-form-label(for="input-date")= __('Grading date')
         div.col-sm-10
           input#input-date.form-control(
             type="date", 

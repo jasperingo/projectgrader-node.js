@@ -1,5 +1,16 @@
 extends layout
 
+
+mixin listItem(url, title)
+  li.pb-4.col-md-4
+    div.card
+      svg.svg-big.d-block.my-3.m-auto(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512")
+        path(d="M224 256A128 128 0 1 0 96 128a128 128 0 0 0 128 128zm96 64a63.08 63.08 0 0 1 8.1-30.5c-4.8-.5-9.5-1.5-14.5-1.5h-16.7a174.08 174.08 0 0 1-145.8 0h-16.7A134.43 134.43 0 0 0 0 422.4V464a48 48 0 0 0 48 48h280.9a63.54 63.54 0 0 1-8.9-32zm288-32h-32v-80a80 80 0 0 0-160 0v80h-32a32 32 0 0 0-32 32v160a32 32 0 0 0 32 32h224a32 32 0 0 0 32-32V320a32 32 0 0 0-32-32zM496 432a32 32 0 1 1 32-32 32 32 0 0 1-32 32zm32-144h-64v-80a32 32 0 0 1 64 0z")
+      div.card-body.py-3.text-center
+        h3.text-uppercase= __(title)
+        a.btn.btn-primary.px-5.py-4.fs-3.text-uppercase(href=url)= __('user.Login')
+
+
 block title
   title= title
 
@@ -7,32 +18,12 @@ block content
 
   div.container
     
-    h2.fs-3.py-3.ff-bold Login according to your role
-    
-    ul.row.list-unstyled
-      li.pb-4.col-md-4
-        div.card
-          svg.svg-big.d-block.my-3.m-auto(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512")
-            path(d="M224 256A128 128 0 1 0 96 128a128 128 0 0 0 128 128zm96 64a63.08 63.08 0 0 1 8.1-30.5c-4.8-.5-9.5-1.5-14.5-1.5h-16.7a174.08 174.08 0 0 1-145.8 0h-16.7A134.43 134.43 0 0 0 0 422.4V464a48 48 0 0 0 48 48h280.9a63.54 63.54 0 0 1-8.9-32zm288-32h-32v-80a80 80 0 0 0-160 0v80h-32a32 32 0 0 0-32 32v160a32 32 0 0 0 32 32h224a32 32 0 0 0 32-32V320a32 32 0 0 0-32-32zM496 432a32 32 0 1 1 32-32 32 32 0 0 1-32 32zm32-144h-64v-80a32 32 0 0 1 64 0z")
-          div.card-body.py-3.text-center
-            h3 HEAD OF DEPARTMENT
-            a.btn.btn-primary.px-5.py-4.fs-3(href="hod/login") LOGIN
+    ul.row.list-unstyled.mt-5
+      +listItem('hod/login', 'user.Head of Department')
 
-      li.pb-4.col-md-4
-        div.card
-          svg.svg-big.d-block.my-3.m-auto(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512")
-            path(d="M224 256A128 128 0 1 0 96 128a128 128 0 0 0 128 128zm96 64a63.08 63.08 0 0 1 8.1-30.5c-4.8-.5-9.5-1.5-14.5-1.5h-16.7a174.08 174.08 0 0 1-145.8 0h-16.7A134.43 134.43 0 0 0 0 422.4V464a48 48 0 0 0 48 48h280.9a63.54 63.54 0 0 1-8.9-32zm288-32h-32v-80a80 80 0 0 0-160 0v80h-32a32 32 0 0 0-32 32v160a32 32 0 0 0 32 32h224a32 32 0 0 0 32-32V320a32 32 0 0 0-32-32zM496 432a32 32 0 1 1 32-32 32 32 0 0 1-32 32zm32-144h-64v-80a32 32 0 0 1 64 0z")
-          div.card-body.py-3.text-center
-            h3 INTERNAL SUPERVISOR
-            a.btn.btn-primary.px-5.py-4.fs-3(href="is/login") LOGIN
+      +listItem('is/login', 'user.Internal Supervisor')
 
-      li.pb-4.col-md-4
-        div.card
-          svg.svg-big.d-block.my-3.m-auto(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512")
-            path(d="M224 256A128 128 0 1 0 96 128a128 128 0 0 0 128 128zm96 64a63.08 63.08 0 0 1 8.1-30.5c-4.8-.5-9.5-1.5-14.5-1.5h-16.7a174.08 174.08 0 0 1-145.8 0h-16.7A134.43 134.43 0 0 0 0 422.4V464a48 48 0 0 0 48 48h280.9a63.54 63.54 0 0 1-8.9-32zm288-32h-32v-80a80 80 0 0 0-160 0v80h-32a32 32 0 0 0-32 32v160a32 32 0 0 0 32 32h224a32 32 0 0 0 32-32V320a32 32 0 0 0-32-32zM496 432a32 32 0 1 1 32-32 32 32 0 0 1-32 32zm32-144h-64v-80a32 32 0 0 1 64 0z")
-          div.card-body.py-3.text-center
-            h3 EXTERNAL SUPERVISOR
-            a.btn.btn-primary.px-5.py-4.fs-3(href="es/login") LOGIN
+      +listItem('es/login', 'user.External Supervisor')
 
 
 

@@ -12,21 +12,16 @@ exports.index = function (req, res) {
 
 	res.render('admin_dashboard', {
 		title: res.__('user.Administrator'),
-		user : { 
-			name : req.session.admin.name,
-			role : 'admin'
-		 },
+		user : req.session.user,
 	});
 }
 
 
 exports.getLogin = function (req, res) {
-	var ii = req.flash('form_data')[0];
-	console.log(ii);
 
 	res.render('admin_login', {
 	    title : res.__('user.{{ name }} Login', { name : res.__('user.Administrator')}),
-	    form_data : ii
+	    form_data : req.flash('form_data')[0]
 	});
 }
 
@@ -60,14 +55,6 @@ exports.postLogin = async function (req, res) {
 
 }
 
-
-exports.postLogOut = function (req, res) {
-
-	req.session.destroy(function(err) {
-		if (err) res.redirect('/');
-		else res.redirect('login');
-	})
-};
 
 
 exports.getAddStudent = async function (req, res) {

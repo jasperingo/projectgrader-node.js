@@ -11,6 +11,8 @@ block content
       -var empty_text = __('No project found') 
       
       div.container 
+        
+        -var d = { projects : data }
 
         include project_list_table
 

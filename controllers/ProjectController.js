@@ -3,6 +3,7 @@
 
 var Project = require('../models/Project');
 var IS = require('../models/IS');
+var ES = require('../models/ES');
 var Student = require('../models/Student');
 
 var { getPagination, postFlasher, hashPassword, getSectionArray } = require('../Helpers');
@@ -11,10 +12,26 @@ var { body, validationResult } = require('express-validator');
 
 
 
-exports.index = function (req, res) {
+exports.index = async function (req, res, next) {
 
-	res.send('e go b');
+	try {
+
+		var data = await Project.findById(req.params.id);
+
+		res.render('project', {
+			title : `${res.__('Project')} ${req.params.id}`,
+			user : req.session.user,
+			data,
+
+		});
+
+	} catch (error) {
+
+		next(error);
+	}
+
 }
+
 
 
 exports.getUpdate = function (req, res) {
@@ -27,10 +44,158 @@ exports.getUpdate = function (req, res) {
 }
 
 
-
 exports.postUpdate = [
 
+	body('email').trim().isEmail().withMessage((value, {req}) => req.__('errors-msgs.Email')).bail()
+	.custom(async (value, { req }) => {
+	    
+	    try {
+
+			var result = await ES.findByEmail(req.body.email); 
+
+		    if (!result) {
+		    	throw new Error(req.__('errors-msgs.Email'));
+		    }
+
+		    req.body.ESID = result.id;
+
+		    return true;
+
+		} catch (error) {
+			throw error;
+		}
+
+	}).bail()
+	.custom(async (value, { req }) => {
+
+		try {
+		    
+			var results = await Project.findAllBySectionAndExternalSupervisor(req.body.section, req.body.ESID, [0,1]);
+
+		    if (results.length > 0) {
+		    	throw new Error(req.__('errors-msgs.External Supervisor assigned'));
+		    }
+
+		    return true;
+
+	    } catch (error) {
+			throw error;
+		}
+
+	}).escape(),
+	
+	
+    body('department').trim().custom((value, { req }) => {
+	    if (!req.__('departments-array')[value]) {
+	    	throw new Error(req.__('Choose a department'));
+	    }
+	    return true;
+	}).escape(),
+
+    body('section').trim().isIn(getSectionArray()).withMessage((value, {req}) => req.__('Choose a section')),
+
+    body('grade_date').custom((value, { req }) => {
+
+    	var date = new Date(value);
+		if (isNaN(date.getTime()) || date.getTime() <= Date.now()) {
+			throw new Error(req.__('errors-msgs.Date is invalid'));
+	    }
+
+	    return true;
+	}),
+
+
+	function (req, res, next) {
+		
+	  	var errors = validationResult(req);
+	  	
+	    if (!errors.isEmpty()) {
+
+	    	var emailErrs = [req.__('errors-msgs.Email'), req.__('errors-msgs.External Supervisor assigned')];
+
+	    	var errs = errors.array();
+
+	    	var formErr = null;
+
+	    	for (var i=0; i<errs.length; i++) {
+	    		if (errs[i].param === 'email' && emailErrs.indexOf(errs[i].msg) < 0) {
+	    			errs.splice(i, 1);
+	    			formErr = { error : req.__('errors-msgs.unknown') };
+	    			break;
+	    		}
+	    	}
+
+	    	req.flash('form_data', postFlasher(req.body, errs, formErr));
+
+	    	res.redirect('update');
+	    	
+	    } else {
+
+	    	next();
+	    }
+	}, 
+
+	async function (req, res, next) {
+		
+		try {
+
+			var result = await Project.findAllBySectionAndDepartment(
+				req.body.section, 
+				req.__('departments-array')[req.body.department], 
+				[0,1]
+			);
+
+			if (result.length > 0 && result[0].projects[0].external_supervisor_id != null) {
+		    	req.flash('form_data', postFlasher(req.body, [], { 
+		    		error : req.__('errors-msgs.Department - section External Supervisor assigned') 
+		    	}));
+
+				res.redirect('update');
+		    } else {
+		    	next();
+		    }
+
+		} catch (error) {
+
+			req.flash('form_data', postFlasher(req.body, [], { error : req.__('errors-msgs.unknown') }));
+
+			res.redirect('update');
+
+		  	console.log(error);
+		}
+
+	},
+
+	async function (req, res) {
+
+		try {
+		  	
+		  	var result = await Project.updateMany(
+		  		req.body.ESID, 
+		  		req.body.grade_date, 
+		  		req.__('departments-array')[req.body.department], 
+		  		req.body.section
+		  	);
+
+		  	req.flash('form_data', {
+		  		form_success : req.__('user.Project has been updated')
+		  	});
+
+		} catch (error) {
+
+		  	req.flash('form_data', postFlasher(req.body, [], { error : req.__('errors-msgs.unknown') }));
+
+		  	console.log(error);
+
+		} finally {
+
+	    	res.redirect('update');
+		}
+
+	}
 ];
+
+
 
 
 exports.getAdd = function (req, res) {
@@ -191,7 +356,7 @@ exports.postAdd = [
 		}
 
 		if (formErrs != null || errs.length > 0) {
-			console.log(errs, formErrs)
+			
 			req.flash('form_data', postFlasher(req.body, errs, formErrs));
 
 	    	res.redirect('add');
