@@ -10,7 +10,7 @@ div.bg-dark.text-light.py-5
 
       h3.col-md-8 #{__('Welcome')}, #{user.name} 
       
-      if (user.role != 'admin')
+      if (user.type != 'admin')
         form.col-md-4(method="GET", action="")
           div.input-group
             select#input-department.form-select(name="fsection")
