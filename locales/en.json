@@ -23,8 +23,10 @@
 	"Grade student" : "Grade student",
 	"Grading date" : "Grading date",
 	"Visitation score" : "Visitation score",
-	"Paper work score" : "Paper work score",
-	"Participation score" : "Participation score",
+	"Presentation score" : "Presentation score",
+	"Relevance score" : "Relevance score",
+	"Dressing score" : "Dressing score",
+	"Total score" : "Total score",
 	"Paper work is up to standard" : "Paper work is up to standard",
 	"Participated in project work" : "Student participated in project work",
 	"Passed" : "Passed",
@@ -81,7 +83,7 @@
 		"Participation score failed" : "Did not participate in project work",
 		"Grading date" : "You cannot grade this student until the grading date",
 		"No grading" : "Student has not yet been graded",
-		"External grading not allowed failed" : "You cannot grade this student because",
+		"External grading not allowed failed" : "You cannot grade this student because because he/she did not pass visitation grading",
 		"External grading not allowed pending" : "You cannot grade this student because he/she hasn't been clear by the Internal Supervisor.",
 		"unknown" : "Oop! there was an error.",
 		"Password length" : "Password must be more than 5 characters.",
@@ -103,11 +105,11 @@
 
 
 	"project-status-array" : [
-		"Pending",
-		"Failed",
-		"Passed"
+		"Not accessible",
+		"Not accessible",
+		"Accessible"
 	],
-
+ 
 	"departments-array" : [
 		"Information Technology",
 		"Computer Science",

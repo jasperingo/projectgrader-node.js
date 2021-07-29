@@ -63,11 +63,11 @@ module.exports = class Project {
 		});
 	}
 
-	static preGrade(id, visitation, paper_work, participation) {
+	static preGrade(id, visitation) {
 
 		return new Promise((resolve, reject) => {
-			db.query(`UPDATE project SET visitation_score = ?, paper_work_score = ?, participation_score = ? WHERE id = ?`, 
-				[visitation, paper_work, participation, id], 
+			db.query(`UPDATE project SET visitation_score = ? WHERE id = ?`, 
+				[visitation, id], 
 				(err, result) => {
 
 				if (err) reject(err);
@@ -77,11 +77,11 @@ module.exports = class Project {
 		});
 	}
 
-	static ISGrade(id, grade) {
+	static ISGrade(id, presentation, dressing, relevance) {
 
 		return new Promise((resolve, reject) => {
-			db.query(`UPDATE project SET internal_score = ? WHERE id = ?`, 
-				[grade, id], 
+			db.query(`UPDATE project SET internal_score = ?, internal_dressing_score = ?, internal_relevance_score = ? WHERE id = ?`, 
+				[presentation, dressing, relevance, id], 
 				(err, result) => {
 
 				if (err) reject(err);
@@ -91,11 +91,11 @@ module.exports = class Project {
 		});
 	}
 	
-	static ESGrade(id, grade) {
+	static ESGrade(id, presentation, dressing, relevance) {
 
 		return new Promise((resolve, reject) => {
-			db.query(`UPDATE project SET external_score = ? WHERE id = ?`, 
-				[grade, id], 
+			db.query(`UPDATE project SET external_score = ?, external_dressing_score = ?, external_relevance_score = ?  WHERE id = ?`, 
+				[presentation, dressing, relevance, id], 
 				(err, result) => {
 
 				if (err) reject(err);
@@ -104,15 +104,13 @@ module.exports = class Project {
 			});
 		});
 	}
-
+	
 
 	static getStatus(project) {
 		let v = project.visitation_score;
-		let pw = project.paper_work_score;
-		let p = project.participation_score;
-		if (v == null && pw == null && p == null) {
+		if (v == null) {
 			project.status = 0;
-		} else if (v < 75 || pw == 0 || p == 0) {
+		} else if (v < 75) {
 			project.status = 1;
 		} else {
 			project.status = 2;
@@ -133,10 +131,12 @@ module.exports = class Project {
 							a.grade_at, a.section, 
 							a.department, 
 							a.internal_score,
+							a.internal_dressing_score,
+							a.internal_relevance_score,
 							a.external_score,
+							a.external_dressing_score,
+							a.external_relevance_score,
 							a.visitation_score, 
-							a.paper_work_score, 
-							a.participation_score,
 							c.name AS internal_supervisor_name,
 							d.name AS external_supervisor_name
 					FROM project AS a 
@@ -262,7 +262,7 @@ module.exports = class Project {
 				
 			db.query(`SELECT a.id, a.student_id, b.name AS student_name, b.matric_number AS student_matric_number, 
 							a.external_supervisor_id, a.grade_at, a.section, a.department, a.visitation_score, 
-							a.paper_work_score, a.participation_score
+							a.internal_dressing_score, a.internal_relevance_score
 					FROM project AS a JOIN student AS b 
 					ON a.student_id = b.id
 					WHERE a.section = ? AND a.internal_supervisor_id = ?`, [section, supervisor], (err, results) => {

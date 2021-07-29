@@ -1,17 +1,28 @@
 
 extends layout
 
-mixin listItem(t, b)
+mixin listItemBox(t, b, t1, b1)
   div.row.border-bottom.border-1.border-light.py-2
-    dt.col-sm-4= __(t)
-    dd.col-sm-8= b
+    +listItem(t, b)
+    +listItem(t1, b1)
+
+mixin listItem(t, b)
+  div.col-sm-6
+    dt= __(t)
+    dd= b
 
 mixin scoreBoard(score, from)
-  li.pb-4(class=user.type == 'hod' ? 'col-md-6' : '')
-    div.card.bg-success.text-white
-      div.card-body.py-3.text-center
-        h3.fs-1= score
-        h5.text-uppercase= __(from)
+  div.card.bg-success.text-white
+    div.card-body.py-3.text-center
+      h3.fs-1= score
+      h5.text-uppercase= __(from)
+
+mixin totalScoreBoard(p, r, d, from)
+  div.card.bg-primary.text-white
+    div.card-body.py-3.text-center
+      h3.fs-1= p != undefined && r != undefined && d != undefined ? p+r+d  : __('Not set')
+      h5.text-uppercase= __(from)
+
 
 
 block content
@@ -31,55 +42,42 @@ block content
       return d+'-'+m+'-'+date.getFullYear();
     }
 
+  -
+    function withGrade(sc) {
+      if (sc >= 70) return sc+' A';
+      else if (sc < 70 && sc >= 60) return sc+' B';
+      else if (sc < 60 && sc >= 50) return sc+' C';
+      else if (sc < 50 && sc >= 40) return sc+' D';
+      else return sc+' F';
+    }
+
   div.border-bottom.border-1.border-secondary.py-5
 
     div.container
 
+      h2.fw-bold.mb-4=__('Project')
+
       dl
         
-        +listItem('user.Name', data.student_name)
+        +listItemBox('user.Name', data.student_name, 'user.Matriculation Number', data.student_matric_number)
 
-        +listItem('user.Matriculation Number', data.student_matric_number)
+        +listItemBox('user.Department', data.department, 'section', data.section)
 
-        +listItem('user.Department', data.department)
+        +listItemBox('user.Level', data.student_level+' '+__('user.Level'), 'Grading date', isset(data.grade_at, formatDate))
 
-        +listItem('section', data.section)
-
-        +listItem('user.Level', data.student_level+' '+__('user.Level'))
-
-        +listItem('user.Internal Supervisor', data.internal_supervisor_name)
-
-        +listItem('user.External Supervisor', isset(data.external_supervisor_name))
-
-        +listItem('Grading date', isset(data.grade_at, formatDate))
-
-        if user.type != 'es'
-
-          +listItem('Visitation score', isset(data.visitation_score))
-
-          +listItem('Paper work score', isset(data.paper_work_score, isPassed))
-
-          +listItem('Participation score', isset(data.participation_score, isPassed))
+        +listItemBox('user.Internal Supervisor', data.internal_supervisor_name, 'user.External Supervisor', isset(data.external_supervisor_name))
   
 
   div
 
     div.container
 
-      ul.row.list-unstyled.mt-5
-        if user.type != 'es'
-          +scoreBoard(isset(data.internal_score), 'user.Internal Supervisor score')
-        
-        if user.type != 'is'
-          +scoreBoard(isset(data.external_score), 'user.External Supervisor score')
-
-
       if (user.type == 'is' && data.status == 0)
         form#grade-form.my-5(method="POST", action=data.id+'/ispregrade')
           +formMsg()
-          div.mb-3
-            label.col-form-label(for="input-visitaion")= __('Visitation score')
-            input#input-visitaion.form-control(
+          div.mb-3.input-group
+            label.col-form-label.w-100(for="input-visitaion")= __('Visitation score')
+            input#input-visitaion.form-control.form-control-lg(
               type="number", 
               name="visitation", 
               class= inputHasError('visitation'),
@@ -90,60 +88,120 @@ block content
               required
             )
             +errorBox('visitation')
-
-          div.form-check.mb-3
-            input#input-paper-work.form-check-input(type="checkbox", value=1, name="paper_work", class= inputHasError('paper_work'))
-            label.form-check-label(for="input-paper-work")= __('Paper work is up to standard')
-            +errorBox('paper_work')
-
-          div.form-check.mb-3
-            input#input-participation.form-check-input(type="checkbox", value=1, name="participation", class= inputHasError('participation'))
-            label.form-check-label(for="input-participation")= __('Participated in project work')
-            +errorBox('participation')
-  
-        
-          button.btn.btn-primary(type="submit")= __('Grade')
-
-      -var timeBad = (data.grade_at == null || new Date(data.grade_at).getTime() > Date.now());
+            button.btn.btn-primary(type="submit")= __('Grade')
       
+
       if ((user.type == 'is' && data.internal_score == null && data.status > 0) || (user.type == 'es' && data.external_score == null && !timeBad && data.status > 1))
         form#grade-form.my-5(method="POST", action=data.id+'/'+user.type+'grade')
           +formMsg()
-          div.input-group
-            input#input-grade.form-control(
-              type="number", 
-              name="grade", 
-              class= inputHasError('grade'),
-              value= inputHasValue('grade'),
-              placeholder= __('Grade student'),
-              min="0",
-              max=user.type=='is'?40:60,
-              step="0.1",
-              required
-            )
-            button.btn.btn-primary(type="submit")= __('Grade')
-            +errorBox('grade')
+          div.row
+            div.col-md-3.mb-3
+              input#input-grade.form-control.form-control-lg(
+                type="number", 
+                name="presentation", 
+                class= inputHasError('presentation'),
+                value= inputHasValue('presentation'),
+                placeholder= __('Presentation score'),
+                min="0",
+                max=user.type=='is'?20:30,
+                step="0.1",
+                required
+              )
+              +errorBox('presentation')
 
+            div.col-md-3.mb-3
+              input#input-grade.form-control.form-control-lg(
+                type="number", 
+                name="dressing", 
+                class= inputHasError('dressing'),
+                value= inputHasValue('dressing'),
+                placeholder= __('Dressing score')
+                min="0",
+                max=user.type=='is'?10:15,
+                step="0.1",
+                required
+              )
+              +errorBox('dressing')
+
+            div.col-md-3.mb-3
+              input#input-grade.form-control.form-control-lg(
+                type="number", 
+                name="relevance", 
+                class= inputHasError('relevance'),
+                value= inputHasValue('relevance'),
+                placeholder= __('Relevance score'),
+                min="0",
+                max=user.type=='is'?10:15,
+                step="0.1",
+                required
+              )
+              +errorBox('relevance')
+
+            div.col-md-3
+              button.btn.btn-primary.d-block.w-100.btn-lg(type="submit")= __('Grade')
+            
+
+
+      -var timeBad = (data.grade_at == null || new Date(data.grade_at).getTime() > Date.now());
 
       if user.type == 'es' && timeBad
-        div.alert.alert-danger.text-center.py-5(role="alert")= __('errors-msgs.Grading date')
+        div.alert.alert-danger.text-center.py-5.mt-5(role="alert")= __('errors-msgs.Grading date')
       
       if user.type == 'es' && data.status == 0 && !timeBad
-        div.alert.alert-danger.text-center.py-5(role="alert")= __('errors-msgs.External grading not allowed pending')
-
+        div.alert.alert-danger.text-center.py-5.mt-5(role="alert")= __('errors-msgs.External grading not allowed pending')
 
       if user.type == 'es' && data.status == 1 && !timeBad
-        div.alert.alert-danger.text-center.py-5(role="alert")
+        div.alert.alert-danger.text-center.py-5.mt-5(role="alert")=  __('errors-msgs.External grading not allowed failed')
 
-          h3= __('errors-msgs.External grading not allowed failed')
 
-          ul
-            if data.visitation_score < 75
-              li= __('errors-msgs.Visitation score failed')
-            if data.paper_work_score == 0
-              li= __('errors-msgs.Paper work score failed')
-            if data.participation_score == 0
-              li= __('errors-msgs.Participation score failed')
+
+      ul.row.list-unstyled.mt-5
+
+        if user.type == 'is' || user.type == 'hod'
+
+          h5.fw-bold.mb-2=__('Internal supervisor')
+
+          ul.list-unstyled.row.mb-4
+            li.col-12.mb-3
+              +scoreBoard(isset(data.visitation_score), 'Visitation score')
+            li.col-sm-6.col-md-3.mb-3
+              +scoreBoard(isset(data.internal_score), 'Presentation score')
+            li.col-sm-6.col-md-3.mb-3
+              +scoreBoard(isset(data.internal_relevance_score), 'Relevance score')
+            li.col-sm-6.col-md-3
+              +scoreBoard(isset(data.internal_dressing_score), 'Dressing score')
+            li.col-sm-6.col-md-3
+              +totalScoreBoard(data.internal_score, data.internal_relevance_score, data.internal_dressing_score, 'Total score')
+        
+        if user.type == 'es' || user.type == 'hod'
+
+          h5.fw-bold.mb-2= __('External supervisor')
+
+          ul.list-unstyled.row
+            li.col-sm-6.col-md-3.mb-3
+              +scoreBoard(isset(data.external_score), 'Presentation score')
+            li.col-sm-6.col-md-3.mb-3
+              +scoreBoard(isset(data.external_relevance_score), 'Relevance score')
+            li.col-sm-6.col-md-3
+              +scoreBoard(isset(data.external_dressing_score), 'Dressing score')
+            li.col-sm-6.col-md-3
+              +totalScoreBoard(data.external_score, data.external_relevance_score, data.external_dressing_score, 'Total score')
+
+        if user.type == 'hod' && (data.external_score != undefined && data.external_dressing_score != undefined && data.external_relevance_score != undefined && data.internal_score != undefined && data.internal_dressing_score != undefined && data.internal_relevance_score != undefined)
+           ul.list-unstyled.row.mt-3
+            li.col-12.mb-3
+              div.card.bg-danger.text-white
+                div.card-body.py-3.text-center
+                  h3.fs-1= withGrade(data.external_score + data.external_dressing_score + data.external_relevance_score + data.internal_score + data.internal_dressing_score + data.internal_relevance_score)
+                  h5.text-uppercase= __('Total score')
+
+
+
+
+     
+
+
+
 
 
 

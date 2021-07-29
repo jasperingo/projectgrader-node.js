@@ -62,10 +62,6 @@ exports.ISPreGrade = [
 	
 	body('visitation').trim().isFloat({ min : 0, max : 100 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
 
-	body('paper_work').trim().isInt({ min : 0, max : 1 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
-
-	body('participation').trim().isInt({ min : 0, max : 1 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
-
 	function (req, res, next) {
 
 	  	var errors = validationResult(req);
@@ -106,9 +102,7 @@ exports.ISPreGrade = [
 
 				var result = await Project.preGrade(
 			  		req.params.id, 
-			  		req.body.visitation, 
-			  		req.body.paper_work, 
-					req.body.participation
+			  		req.body.visitation
 			  	);
 
 				if (result.affectedRows > 0)
@@ -134,7 +128,9 @@ exports.ISPreGrade = [
 
 exports.ISGrade = [
 
-	body('grade').trim().isFloat({ min : 0, max : 40 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
+	body('presentation').trim().isFloat({ min : 0, max : 20 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
+	body('dressing').trim().isFloat({ min : 0, max : 10 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
+	body('relevance').trim().isFloat({ min : 0, max : 10 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
 
 	function (req, res, next) {
 
@@ -177,7 +173,9 @@ exports.ISGrade = [
 
 				var result = await Project.ISGrade(
 			  		req.params.id, 
-			  		req.body.grade
+			  		req.body.presentation,
+			  		req.body.dressing,
+			  		req.body.relevance
 			  	);
 
 				if (result.affectedRows > 0)
@@ -201,7 +199,9 @@ exports.ISGrade = [
 
 exports.ESGrade = [
 
-	body('grade').trim().isFloat({ min : 0, max : 60 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
+	body('presentation').trim().isFloat({ min : 0, max : 30 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
+	body('dressing').trim().isFloat({ min : 0, max : 15 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
+	body('relevance').trim().isFloat({ min : 0, max : 15 }).withMessage((value, {req}) => req.__('errors-msgs.Score invalid')),
 
 	function (req, res, next) {
 
@@ -245,7 +245,9 @@ exports.ESGrade = [
 
 				var result = await Project.ESGrade(
 			  		req.params.id, 
-			  		req.body.grade
+			  		req.body.presentation,
+			  		req.body.dressing,
+			  		req.body.relevance
 			  	);
 
 				if (result.affectedRows > 0)
