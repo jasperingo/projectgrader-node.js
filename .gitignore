@@ -1,4 +1,2 @@
 /node_modules
-/public/stylesheets/bootstrap5
-/public/javascripts/jquery3.js
 .env
